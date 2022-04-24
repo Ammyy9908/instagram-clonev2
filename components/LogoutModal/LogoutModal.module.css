@@ -1,0 +1,51 @@
+.modal_overlay{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout_modal{
+    min-width: 398px;
+    padding:18px 0;
+    background-color: #fff;
+    border-radius: 8px;
+    animation:scaleUp 0.3s ease-in-out 1;
+}
+@keyframes scaleUp{
+    0%{
+        transform: scale(0);
+    }
+    100%{
+        transform: scale(1);
+    }
+}
+.logout_modal_body{
+    min-height: 93px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout_modal_footer{
+    display: flex;
+    border-top: 1px solid #dbdbdb;
+    padding-top: 12px;
+    margin:0 auto;
+    align-items: center;
+}
+.logout_modal_footer button{
+    width: 90%;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

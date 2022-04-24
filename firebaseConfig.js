@@ -1,24 +1,26 @@
 // Import the functions you need from the SDKs you need
-import dotenv from "next/dotenv";
 
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-dotenv.config();
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
+console.log(process.env.API_KEY, process.env.AUTH_DOMAIN);
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET,
-  messagingSenderId: process.env.MESSAGE_ID,
-  appId: process.env.APP_ID,
+  apiKey: "AIzaSyA2k_DbkrEtyKLS4cGO_te6kkFgjROWJ5w",
+  authDomain: "instagram-3e52f.firebaseapp.com",
+  projectId: "instagram-3e52f",
+  storageBucket: "instagram-3e52f.appspot.com",
+  messagingSenderId: "701917918836",
+  appId: "1:701917918836:web:8c7e3362e2d04db4708321",
   measurementId: "G-9T578CYXJ8",
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getFirestore(app);
+const firebase = initializeApp(firebaseConfig);
+const auth = getAuth(firebase);
+const database = getDatabase(firebase);
+
+export { auth, firebase, database };

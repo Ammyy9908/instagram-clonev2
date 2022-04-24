@@ -1,11 +1,15 @@
 import React from "react";
-import Logo from "../../public/assets/Icons/Logo";
 import styles from "./Navbar.module.css";
+import { FaRegUserCircle } from "react-icons/fa";
+import { GrSettingsOption } from "react-icons/gr";
+import { BsBookmark } from "react-icons/bs";
+import { MdRestartAlt } from "react-icons/md";
 
 function NavButton({ children }) {
   return <div className={styles.menu_btn_item}>{children}</div>;
 }
-function Navbar() {
+function Navbar({ setLogout }) {
+  const [dropdown, setDropdown] = React.useState(false);
   return (
     <div className={styles.navbar}>
       <div className={[styles.navbar_container]}>
@@ -41,13 +45,67 @@ function Navbar() {
             </NavButton>
             <NavButton>
               <div
-                className="user_avatar rounded-xl"
+                className={`${styles.user_avatar} rounded-xl cursor-pointer`}
                 style={{
                   width: "23px",
                   height: "23px",
                   backgroundColor: "#eee",
+                  position: "relative",
                 }}
-              ></div>
+                tabIndex="1"
+                onClick={() => setDropdown(!dropdown)}
+              >
+                {dropdown && (
+                  <div className={styles.user_dropdown}>
+                    <ul className={styles.user_dropdown_list}>
+                      <li>
+                        <a href="#">
+                          <span>
+                            <FaRegUserCircle />
+                          </span>
+                          Profile
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <span>
+                            <BsBookmark />
+                          </span>
+                          Saved
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <span>
+                            <GrSettingsOption />
+                          </span>
+                          Settings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="#">
+                          <span>
+                            <MdRestartAlt />
+                          </span>
+                          Switch accounts
+                        </a>
+                      </li>
+                    </ul>
+                    <div
+                      className={`${styles.dropdown_footer} flex py-3 py-2 items-center justify-center`}
+                    >
+                      <button
+                        onClick={() => {
+                          console.log("clicked");
+                          setLogout(true);
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </NavButton>
           </div>
         </div>

@@ -1,0 +1,131 @@
+.post{
+    width:100%;
+    background-color: #fff;
+    border: 1px solid #EFEFEF;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    
+}
+.post_header{
+    width:100%;
+    height:60px;
+    display: flex;
+    align-items: center;
+}
+.post_header_wrapper{
+    width:90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.header_content{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.post_avatar_cirlce{
+    width:42px;
+    height:42px;
+}
+.post_avatar_ellipse{
+    width:100%;
+    height:100%;
+border-radius: 65px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.post_avatar_ellipse img{
+    width: 90%;
+    height: 90%;
+    border-radius: 65px;
+    object-fit: cover;
+    border:2px solid #fff;
+    display: block;
+}
+
+.post_image{
+    width: 100%;
+    position: relative;
+    height:614px;
+    user-select: none;
+    cursor: pointer;
+}
+.heart_post{
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    color: #fff;
+    font-size: 32px;
+    opacity: 0;
+}
+.heart_post_enable{
+    transform: scale(1.5);
+    animation:scaleup .8s ease-in-out 1;
+}
+@keyframes scaleup {
+    0% {
+        transform: scale(1);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(4.5);
+        opacity: 0.8;
+    }
+}
+.post_image img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post_footer_controls{
+    width:95%;
+    margin:15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.control_list{
+    display: flex;
+    align-items: center;
+    gap:22px;
+}
+.post_likes_container{
+    width:95%;
+    margin: 12px auto;
+}
+.post_comment_section{
+    width:95%;
+    margin: 5px auto;
+}
+.comment_frame{
+    display: flex;
+    align-items: flex-start;
+    gap:5px;
+}
+.post_time{
+    width:95%;
+    margin: 5px auto;
+}
+.post_comment_input{
+    width: 100%;
+    height:52px;
+    display: flex;
+    align-items: center;
+}
+.post_comment_input_container{
+    width:90%;
+    margin-left: auto;
+    margin-right: auto;
+    height:85%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.post_comment_left_section{
+    display: flex;
+    align-items: center;
+    gap:22px;
+}

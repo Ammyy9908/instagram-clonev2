@@ -55,6 +55,11 @@
 .user_avatar:focus{
     border: 1px solid;
 }
+.user_avatar img{
+    width:100%;
+    height:100%;
+    border-radius: 65px;
+}
 /* .user_avatar:focus .user_dropdown{
     display: block;
 } */

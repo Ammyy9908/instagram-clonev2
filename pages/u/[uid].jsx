@@ -6,7 +6,18 @@ import { RiSettingsLine } from "react-icons/ri";
 import styles from "./Profile.module.css";
 import { BsFillHeartFill } from "react-icons/bs";
 import { FaCommentDots, FaPlay } from "react-icons/fa";
-
+import getFollowers from "../../utils/getFollowers";
+import { getAuth } from "firebase/auth";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getFirestore,
+} from "firebase/firestore";
+import { firebase } from "../../firebaseConfig";
+const auth = getAuth();
+const db = getFirestore();
 function ProfilePost({ image, type }) {
   return (
     <div className={`${styles.profile_post_item} cursor-pointer`}>
@@ -27,10 +38,24 @@ function ProfilePost({ image, type }) {
   );
 }
 function User() {
+  const [data, setData] = React.useState([]);
   const router = useRouter();
   const { uid } = router.query;
   const [tab, setTab] = React.useState(0);
   const mypost = [];
+  const [fdata, setFdata] = React.useState([]);
+
+  React.useEffect(() => {
+    const q = query(collection(db, "followers"));
+
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      const d = querySnapshot.docs.map((doc) => doc.data());
+      setFdata(d);
+    });
+
+    return () => unsub();
+  }, []);
+
   let user = "sumit";
   const posts = [
     {
@@ -83,6 +108,18 @@ function User() {
     },
   ];
 
+  const getFollowCount = () => {
+    let count_data =
+      fdata.length > 0 && fdata.filter((item) => item.following_id == uid);
+    return count_data.length;
+  };
+
+  const getFollowingCount = () => {
+    let count_data =
+      fdata.length > 0 && fdata.filter((item) => item.follower_id == uid);
+    return count_data.length;
+  };
+
   return (
     <div>
       <Head>
@@ -112,11 +149,11 @@ function User() {
                 <p>posts</p>
               </span>
               <span className={styles.user_info_item}>
-                <strong>1,226</strong>
+                <strong>{getFollowCount()}</strong>
                 <p>followers</p>
               </span>
               <span className={styles.user_info_item}>
-                <strong>324</strong>
+                <strong>{getFollowingCount()}</strong>
                 <p>following</p>
               </span>
             </div>

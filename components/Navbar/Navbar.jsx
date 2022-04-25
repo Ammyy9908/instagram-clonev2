@@ -8,8 +8,9 @@ import { MdRestartAlt } from "react-icons/md";
 function NavButton({ children }) {
   return <div className={styles.menu_btn_item}>{children}</div>;
 }
-function Navbar({ setLogout }) {
+function Navbar({ setLogout, user }) {
   const [dropdown, setDropdown] = React.useState(false);
+
   return (
     <div className={styles.navbar}>
       <div className={[styles.navbar_container]}>
@@ -51,10 +52,18 @@ function Navbar({ setLogout }) {
                   height: "23px",
                   backgroundColor: "#eee",
                   position: "relative",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
                 tabIndex="1"
                 onClick={() => setDropdown(!dropdown)}
               >
+                {user && user.avatar !== "null" ? (
+                  <img src={user.avatar} alt={user.name} />
+                ) : (
+                  <p className="text-xs">SK</p>
+                )}
                 {dropdown && (
                   <div className={styles.user_dropdown}>
                     <ul className={styles.user_dropdown_list}>

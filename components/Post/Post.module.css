@@ -17,6 +17,12 @@
     margin-left: auto;
     margin-right: auto;
 }
+.post_meta{
+    display: flex;
+    flex-direction: column;
+    gap:2px;
+    align-items: flex-start;
+}
 .header_content{
     width: 100%;
     display: flex;

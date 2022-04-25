@@ -2,7 +2,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
+import { getFirestore } from "firebase/firestore/lite";
 // TODO: Add SDKs for Firebase products that you want to use
 console.log(process.env.API_KEY, process.env.AUTH_DOMAIN);
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -21,6 +21,6 @@ const firebaseConfig = {
 
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
-const database = getDatabase(firebase);
+const db = getFirestore(firebase);
 
-export { auth, firebase, database };
+export { auth, firebase, db };

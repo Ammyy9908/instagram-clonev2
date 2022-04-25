@@ -4,9 +4,29 @@ import styles from "./Post.module.css";
 import { AiFillHeart, AiTwotoneHeart } from "react-icons/ai";
 import { GrBookmark } from "react-icons/gr";
 import { BsEmojiLaughing } from "react-icons/bs";
-function Post({ image }) {
+import en from "javascript-time-ago/locale/en";
+import TimeAgo from "javascript-time-ago";
+import ReactTimeAgo from "react-time-ago";
+import getLocation from "../../utils/getLocation";
+TimeAgo.addDefaultLocale(en);
+
+function Post({ image, time, lat, long }) {
+  console.log(time);
   const [liked, setLiked] = React.useState(false);
   const [post_liked, setPostLiked] = React.useState(false);
+  const [location, setLocation] = React.useState(false);
+
+  React.useEffect(() => {
+    getLocation(lat, long)
+      .then((data) => {
+        console.log(data);
+        const { results } = data;
+        console.log(results);
+        setLocation(results[0].displayAddress);
+      })
+      .catch((e) => console.log(e));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className={styles.post}>
       <div className={styles.post_header}>
@@ -23,7 +43,12 @@ function Post({ image }) {
                   />
                 </div>
               </div>
-              <p>terrylucas</p>
+              <div className={styles.post_meta}>
+                <p>terrylucas</p>
+                {location && (
+                  <p className="text-gray-500 text-sm">{location}</p>
+                )}
+              </div>
             </div>
 
             <button>
@@ -122,7 +147,9 @@ function Post({ image }) {
           </div>
         </div>
         <div className={styles.post_time}>
-          <p className="text-gray-300 text-xs">1 HOUR AGO</p>
+          <p className="text-gray-300 text-xs">
+            <ReactTimeAgo date={time} locale="en-US" timeStyle="round-minute" />
+          </p>
         </div>
         <div className={styles.post_comment_input}>
           <div className={styles.post_comment_input_container}>

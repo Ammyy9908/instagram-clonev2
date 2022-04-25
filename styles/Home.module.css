@@ -29,7 +29,15 @@
   border-radius: 65px;
   background-position: center center;
   background-size: cover;
-  background-image: url('https://randomuser.me/api/portraits/men/1.jpg');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
+}
+.app_home_user_avatar img{
+  width:100%;
+  height:100%;
+  border-radius: 65px;
 }
 .app_body{
   width:90%;

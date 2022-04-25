@@ -1,14 +1,24 @@
 import { useRouter } from "next/router";
 import React from "react";
 import styles from "./LogoutModal.module.css";
+import { getAuth, signOut } from "firebase/auth";
+import { firebase, db } from "../../firebaseConfig";
+
 function LogoutModal() {
   const router = useRouter();
+  const auth = getAuth();
 
   React.useEffect(() => {
-    setTimeout(() => {
-      router.push("/accounts/login");
-    }, 5000);
-  }, [router]);
+    signOut(auth)
+      .then(() => {
+        console.log("loggedout");
+        router.push("/accounts/login");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className={styles.modal_overlay}>
       <div className={`${styles.logout_modal}`}>

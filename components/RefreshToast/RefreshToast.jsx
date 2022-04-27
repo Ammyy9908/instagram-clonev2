@@ -6,8 +6,12 @@ function RefreshToast({ setPhotos, setRefresh }) {
     getAllPosts()
       .then((r) => {
         console.log(r);
-        setPhotos(r.reverse());
-        setRefresh(false);
+        setPhotos([]);
+
+        setTimeout(() => {
+          setPhotos(r);
+          setRefresh(false);
+        }, 5000);
       })
       .catch((e) => console.log(e));
   };

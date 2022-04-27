@@ -5,6 +5,7 @@ import {
   getDocs,
   getFirestore,
 } from "firebase/firestore";
+import { firebase } from "../firebaseConfig";
 const db = getFirestore();
 const getPostLikes = async (post_id, user_id) => {
   console.log("Post ID: " + post_id);

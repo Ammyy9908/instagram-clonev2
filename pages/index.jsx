@@ -7,6 +7,7 @@ import Post from "../components/Post/Post";
 import styles from "../styles/Home.module.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import getAllPosts from "../utils/getAllPosts";
+import BlankPostCard from "../components/BlankPostCard/BlankPostCard";
 import { firebase } from "../firebaseConfig";
 import {
   collection,
@@ -47,7 +48,6 @@ export default function Home() {
         router.push("/accounts/login");
       }
     });
-
     // update the user's location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -107,20 +107,32 @@ export default function Home() {
         <div className={`${styles.app_grid} block lg:grid`}>
           <div className={styles.app_body}>
             <div className="posts">
-              {photos.map((photo, index) => {
-                return (
-                  <Post
-                    key={index}
-                    image={photo.data.image_path}
-                    time={photo.data.date_created}
-                    lat={photo.data.latitude}
-                    long={photo.data.longitude}
-                    uid={photo.data.user_id}
-                    id={photo.id}
-                    u={user && user}
-                  />
-                );
-              })}
+              {photos.length > 0 ? (
+                photos.map((photo, index) => {
+                  return (
+                    <Post
+                      key={index}
+                      image={photo.data.image_path}
+                      time={photo.data.date_created}
+                      lat={photo.data.latitude}
+                      long={photo.data.longitude}
+                      uid={photo.data.user_id}
+                      id={photo.id}
+                      u={user && user}
+                    />
+                  );
+                })
+              ) : (
+                <>
+                  <BlankPostCard />
+                  <BlankPostCard />
+                  <BlankPostCard />
+                  <BlankPostCard />
+                  <BlankPostCard />
+                  <BlankPostCard />
+                  <BlankPostCard />
+                </>
+              )}
             </div>
           </div>
           <div className={`${styles.primary_secondary} hidden lg:block`}>

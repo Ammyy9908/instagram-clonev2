@@ -1,3 +1,4 @@
+import { firebase } from "../firebaseConfig";
 import {
   collection,
   query,
@@ -5,6 +6,7 @@ import {
   getDocs,
   getFirestore,
 } from "firebase/firestore";
+
 const db = getFirestore();
 const getAllPosts = async () => {
   const q = query(collection(db, "photos"));

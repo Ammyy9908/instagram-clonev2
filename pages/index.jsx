@@ -7,6 +7,7 @@ import Post from "../components/Post/Post";
 import styles from "../styles/Home.module.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import getAllPosts from "../utils/getAllPosts";
+import { firebase } from "../firebaseConfig";
 import {
   collection,
   query,

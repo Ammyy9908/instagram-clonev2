@@ -36,7 +36,7 @@ export default function Home() {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
-        const uid = user.uid;
+        const uid = user && user.uid ? user.uid : null;
         console.log(user);
         const u = await getCurrentUserData(uid);
         setUser(u);
@@ -134,7 +134,7 @@ export default function Home() {
                   )}
                 </div>
                 <div className={styles.app_home_user_info}>
-                  <Link href={`/u/${user.uid}`}>
+                  <Link href={`/u/${user && user.uid}`}>
                     <a>
                       <p className="font-semibold">{user.name}</p>
                     </a>

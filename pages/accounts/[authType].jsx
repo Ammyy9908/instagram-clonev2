@@ -107,6 +107,7 @@ function Auth() {
     let ipData = await ip.json();
     let ipAddress = ipData.ip;
     setDoc(collectionRef, {
+      saved_posts: [],
       avatar: "null",
       uid: user.uid,
       email: user.email,

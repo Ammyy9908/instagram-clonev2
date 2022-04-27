@@ -4,11 +4,16 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { GrSettingsOption } from "react-icons/gr";
 import { BsBookmark } from "react-icons/bs";
 import { MdRestartAlt } from "react-icons/md";
+import Link from "next/link";
 
-function NavButton({ children }) {
-  return <div className={styles.menu_btn_item}>{children}</div>;
+function NavButton({ children, handler }) {
+  return (
+    <div className={styles.menu_btn_item} onClick={() => handler(true)}>
+      {children}
+    </div>
+  );
 }
-function Navbar({ setLogout, user }) {
+function Navbar({ setLogout, user, setNewPost }) {
   const [dropdown, setDropdown] = React.useState(false);
 
   return (
@@ -16,11 +21,13 @@ function Navbar({ setLogout, user }) {
       <div className={[styles.navbar_container]}>
         <div className={styles.nav_main}>
           <div className="brand-logo">
-            <a href="#">
-              <img src="/assets/insta_logo.png" alt="" />
-            </a>
+            <Link href="/">
+              <a>
+                <img src="/assets/insta_logo.png" alt="" />
+              </a>
+            </Link>
           </div>
-          <div className={styles.searchbar}>
+          <div className={`${styles.searchbar} hidden lg:flex`}>
             <div className={styles.searchbox}>
               <div className={styles.search}>
                 <img src="/assets/search.svg" alt="" />
@@ -29,19 +36,19 @@ function Navbar({ setLogout, user }) {
             </div>
           </div>
           <div className={styles.navbar_buttons}>
-            <NavButton>
+            <NavButton handler={() => {}}>
               <img src="/assets/home.svg" alt="" />
             </NavButton>
-            <NavButton>
+            <NavButton handler={() => {}}>
               <img src="/assets/messenger.svg" alt="" />
             </NavButton>
-            <NavButton>
+            <NavButton handler={setNewPost}>
               <img src="/assets/new.svg" alt="" />
             </NavButton>
-            <NavButton>
+            <NavButton handler={() => {}}>
               <img src="/assets/explore.svg" alt="" />
             </NavButton>
-            <NavButton>
+            <NavButton handler={() => {}}>
               <img src="/assets/heart.svg" alt="" />
             </NavButton>
             <NavButton>

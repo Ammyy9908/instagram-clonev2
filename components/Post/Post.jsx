@@ -1,20 +1,27 @@
-import Image from "next/image";
 import React from "react";
 import styles from "./Post.module.css";
 import { AiFillHeart, AiTwotoneHeart } from "react-icons/ai";
-import { GrBookmark } from "react-icons/gr";
 import { BsEmojiLaughing } from "react-icons/bs";
 import en from "javascript-time-ago/locale/en";
 import TimeAgo from "javascript-time-ago";
 import ReactTimeAgo from "react-time-ago";
 import getLocation from "../../utils/getLocation";
+import getCurrentUserData from "../../utils/getUser";
+import savePost from "../../utils/bookMark";
+import { FaBookmark } from "react-icons/fa";
+import LikePost from "../../utils/LikePost";
+import getPostLikes from "../../utils/getPostLikes";
 TimeAgo.addDefaultLocale(en);
 
-function Post({ image, time, lat, long }) {
-  console.log(time);
+function Post({ image, time, lat, long, uid, id, u }) {
+  console.log(time, uid);
   const [liked, setLiked] = React.useState(false);
   const [post_liked, setPostLiked] = React.useState(false);
   const [location, setLocation] = React.useState(false);
+  const [user, setUser] = React.useState(false);
+  const [bookmarked, setBookmarked] = React.useState(false);
+  const [like_count, setLikeCount] = React.useState(null);
+  const [likes, setLikes] = React.useState(null);
 
   React.useEffect(() => {
     getLocation(lat, long)
@@ -25,8 +32,64 @@ function Post({ image, time, lat, long }) {
         setLocation(results[0].displayAddress);
       })
       .catch((e) => console.log(e));
+
+    // get user of the post
+    getCurrentUserData(uid)
+      .then((user) => {
+        console.log("Post user", user);
+        setUser(user);
+      })
+      .catch((e) => console.log(e));
+
+    // get all likes for the post
+    getPostLikes(id, u.uid)
+      .then((d) => {
+        console.log("Post likes", d);
+        setLikes(d.likes);
+        if (d.pos) {
+          setPostLiked(true);
+        }
+        setLikeCount(d.likes.length);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    // detect already bookmarked
+
+    isSaved();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [uid]);
+
+  const handlePostSave = () => {
+    savePost(user, id)
+      .then((r) => {
+        console.log(r);
+        setBookmarked(true);
+      })
+      .catch((e) => {
+        console.log("Error in saving");
+      });
+  };
+
+  const handlePostLike = () => {
+    LikePost(u, id)
+      .then((r) => {
+        console.log(r);
+        setLikeCount(like_count + 1);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const isSaved = () => {
+    if (user && user.saved_posts.includes(id)) {
+      setBookmarked(true);
+      console.log("runnig");
+    }
+  };
+
   return (
     <div className={styles.post}>
       <div className={styles.post_header}>
@@ -35,8 +98,12 @@ function Post({ image, time, lat, long }) {
             <div className="flex gap-5">
               <div className={styles.post_avatar_cirlce}>
                 <div className={styles.post_avatar_ellipse}>
-                  <Image
-                    src="https://images.unsplash.com/photo-1502033303885-c6e0280a4f5c?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=9be99762d86ae47ab59690f72d984be6"
+                  <img
+                    src={
+                      user && user.avatar !== "null"
+                        ? user.avatar
+                        : "https://images.unsplash.com/photo-1502033303885-c6e0280a4f5c?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=9be99762d86ae47ab59690f72d984be6"
+                    }
                     alt="some-text"
                     width={50}
                     height={50}
@@ -44,7 +111,7 @@ function Post({ image, time, lat, long }) {
                 </div>
               </div>
               <div className={styles.post_meta}>
-                <p>terrylucas</p>
+                {user && <p>{user.name}</p>}
                 {location && (
                   <p className="text-gray-500 text-sm">{location}</p>
                 )}
@@ -60,11 +127,19 @@ function Post({ image, time, lat, long }) {
       <div
         className={styles.post_image}
         onDoubleClick={() => {
-          setLiked(true);
-          setPostLiked(true);
-          setTimeout(() => {
-            setLiked(false);
-          }, 3000);
+          if (!post_liked) {
+            setPostLiked(true);
+            setLiked(true);
+            handlePostLike();
+            setTimeout(() => {
+              setLiked(false);
+            }, 2000);
+          } else {
+            setLiked(true);
+            setTimeout(() => {
+              setLiked(false);
+            }, 2000);
+          }
         }}
       >
         <span
@@ -111,8 +186,12 @@ function Post({ image, time, lat, long }) {
               </li>
             </ul>
           </div>
-          <button>
-            <img src="/assets/Save.svg" alt="" />
+          <button onClick={() => handlePostSave()}>
+            {bookmarked ? (
+              <img src="/assets/Save.svg" alt="" />
+            ) : (
+              <FaBookmark />
+            )}
           </button>
         </div>
         <div className={styles.post_likes_container}>
@@ -124,7 +203,7 @@ function Post({ image, time, lat, long }) {
             }}
             className="text-xs"
           >
-            <strong>1,069</strong>
+            <strong>{like_count}</strong>
             <p>Likes</p>
           </span>
         </div>

@@ -72,13 +72,11 @@ function UserProfilePost({ image, type }) {
   );
 }
 function User() {
-  const [data, setData] = React.useState([]);
   const [user_posts, setUserPosts] = React.useState([]);
   const [User, setUser] = React.useState(false);
   const router = useRouter();
   const { uid } = router.query;
   const [tab, setTab] = React.useState(0);
-  const mypost = [];
   const [fdata, setFdata] = React.useState([]);
 
   React.useEffect(() => {
@@ -143,7 +141,7 @@ function User() {
       <Navbar user={User} />
       <div className={styles.profile_body}>
         <div className={styles.porfile_header}>
-          {user && (
+          {User && (
             <div className={styles.profile_user_avatar}>
               <img
                 src={

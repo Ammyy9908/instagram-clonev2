@@ -20,6 +20,7 @@ import getCurrentUserData from "../utils/getUser";
 import { useRouter } from "next/router";
 import NewPostModal from "../components/NewPostModal/NewPostModal";
 import RefreshToast from "../components/RefreshToast/RefreshToast";
+import useChats from "../hooks/useChats";
 const auth = getAuth();
 const db = getFirestore();
 export default function Home() {
@@ -32,6 +33,8 @@ export default function Home() {
   const [loaded, setLoaded] = React.useState(false);
 
   const router = useRouter();
+  const chats = useChats();
+  console.log("chats", chats);
   React.useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -89,8 +92,6 @@ export default function Home() {
     }
   }, [loaded, photos.length]);
 
-  console.log(user, photos, coords);
-  console.log(refresh);
   return (
     <div>
       <Head>

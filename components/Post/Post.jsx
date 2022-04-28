@@ -11,6 +11,9 @@ import savePost from "../../utils/bookMark";
 import { FaBookmark } from "react-icons/fa";
 import LikePost from "../../utils/LikePost";
 import getPostLikes from "../../utils/getPostLikes";
+import addComment from "../../utils/addComment";
+import useComments from "../../hooks/useComments";
+import getComment from "../../utils/getComment";
 TimeAgo.addDefaultLocale(en);
 
 function Post({ image, time, lat, long, uid, id, u }) {
@@ -22,13 +25,16 @@ function Post({ image, time, lat, long, uid, id, u }) {
   const [bookmarked, setBookmarked] = React.useState(false);
   const [like_count, setLikeCount] = React.useState(null);
   const [likes, setLikes] = React.useState(null);
+  const [comment, setComment] = React.useState("");
+  const [photo_comments, setPhotoComments] = React.useState(null);
+  const [latestComment, setLatestComment] = React.useState(null);
+
+  const cmts = useComments(id);
 
   React.useEffect(() => {
     getLocation(lat, long)
       .then((data) => {
-        console.log(data);
         const { results } = data;
-        console.log(results);
         setLocation(results[0].displayAddress);
       })
       .catch((e) => console.log(e));
@@ -36,7 +42,6 @@ function Post({ image, time, lat, long, uid, id, u }) {
     // get user of the post
     getCurrentUserData(uid)
       .then((user) => {
-        console.log("Post user", user);
         setUser(user);
       })
       .catch((e) => console.log(e));
@@ -44,7 +49,6 @@ function Post({ image, time, lat, long, uid, id, u }) {
     // get all likes for the post
     getPostLikes(id, u.uid)
       .then((d) => {
-        console.log("Post likes", d);
         setLikes(d.likes);
         if (d.pos) {
           setPostLiked(true);
@@ -55,16 +59,21 @@ function Post({ image, time, lat, long, uid, id, u }) {
         console.log(e);
       });
 
+    cmts.length > 0 &&
+      getComment(cmts[cmts.length - 1].comment_id).then((d) => {
+        console.log("Latest comment", d);
+        setLatestComment(d[0].comment);
+      });
+
     // detect already bookmarked
 
     isSaved();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid]);
+  }, [uid, cmts]);
 
   const handlePostSave = () => {
     savePost(user, id)
       .then((r) => {
-        console.log(r);
         setBookmarked(true);
       })
       .catch((e) => {
@@ -75,7 +84,6 @@ function Post({ image, time, lat, long, uid, id, u }) {
   const handlePostLike = () => {
     LikePost(u, id)
       .then((r) => {
-        console.log(r);
         setLikeCount(like_count + 1);
       })
       .catch((e) => {
@@ -86,8 +94,19 @@ function Post({ image, time, lat, long, uid, id, u }) {
   const isSaved = () => {
     if (user && user.saved_posts.includes(id)) {
       setBookmarked(true);
-      console.log("runnig");
     }
+  };
+
+  const handleComment = () => {
+    addComment(comment, u.uid, id)
+      .then((res) => {
+        if (res) {
+          setComment("");
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   return (
@@ -208,22 +227,26 @@ function Post({ image, time, lat, long, uid, id, u }) {
           </span>
         </div>
         <div className={styles.post_comment_section}>
-          <div className={styles.user_comment}>
-            <div className={`${styles.comment_frame} text-xs`}>
-              <span>sumitbighaniya</span>
-              <span>
-                <p className="text-gray-400">
-                  Imperdiet in sit rhoncus...
-                  <a href="#more" className=" text-gray-600 underline">
-                    more
-                  </a>
-                </p>
-              </span>
+          {latestComment && (
+            <div className={styles.user_comment}>
+              <div className={`${styles.comment_frame} text-xs`}>
+                <span>sumitbighaniya</span>
+                <span>
+                  <p className="text-gray-400">
+                    {latestComment}
+                    <a href="#more" className=" text-gray-600 underline">
+                      more
+                    </a>
+                  </p>
+                </span>
+              </div>
             </div>
-          </div>
-          <div className="comment_header text-xs">
-            <p className="text-gray-400">View all 100 comments</p>
-          </div>
+          )}
+          {cmts.length > 0 && (
+            <div className="comment_header text-xs">
+              <p className="text-gray-400">View all {cmts.length} comments</p>
+            </div>
+          )}
         </div>
         <div className={styles.post_time}>
           <p className="text-gray-300 text-xs">
@@ -236,9 +259,14 @@ function Post({ image, time, lat, long, uid, id, u }) {
               <button>
                 <BsEmojiLaughing />
               </button>
-              <input type="text" placeholder="Add a comment..." />
+              <input
+                type="text"
+                placeholder="Add a comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
             </div>
-            <button>
+            <button onClick={handleComment}>
               <span className="text-sky-300">Post</span>
             </button>
           </div>

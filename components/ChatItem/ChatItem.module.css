@@ -1,0 +1,32 @@
+.chat_item{
+    cursor: pointer;
+    padding: 8px 20px;
+    border-radius: 12px;
+}
+.chat_item:hover{
+    background-color: #f5f5f5;
+}
+.chat_item_wrapper{
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: stretch;
+}
+
+
+.chat_user{
+    margin-right: 12px;
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    width: 56px;
+    height: 56px;
+    background-color: #eee;
+    border-radius: 50%;
+}
+.chat_user_meta{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap:3px;
+}

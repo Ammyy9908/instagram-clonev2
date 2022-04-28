@@ -7,13 +7,24 @@ import { MdRestartAlt } from "react-icons/md";
 import { FiInstagram } from "react-icons/fi";
 import Link from "next/link";
 
+function NavLink({ children, link }) {
+  return (
+    <Link href={link}>
+      <a>
+        <div className={`${styles.menu_btn_item}`}>{children}</div>
+      </a>
+    </Link>
+  );
+}
+
 function NavButton({ children, handler }) {
   return (
-    <div className={`${styles.menu_btn_item}`} onClick={() => handler(true)}>
+    <div className={`${styles.menu_btn_item}`} onClick={handler}>
       {children}
     </div>
   );
 }
+
 function Navbar({ setLogout, user, setNewPost }) {
   const [dropdown, setDropdown] = React.useState(false);
 
@@ -47,19 +58,23 @@ function Navbar({ setLogout, user, setNewPost }) {
             </div>
           </div>
           <div className={styles.navbar_buttons}>
-            <NavButton handler={() => {}}>
+            <NavLink link="/">
               <img src="/assets/home.svg" alt="" />
-            </NavButton>
-            <NavButton handler={() => {}}>
+            </NavLink>
+            <NavLink link="/direct">
               <img src="/assets/messenger.svg" alt="" />
-            </NavButton>
-            <NavButton handler={setNewPost}>
+            </NavLink>
+            <NavButton
+              handler={() => {
+                setNewPost(true);
+              }}
+            >
               <img src="/assets/new.svg" alt="" />
             </NavButton>
-            <NavButton handler={() => {}}>
+            <NavLink link="/explore">
               <img src="/assets/explore.svg" alt="" />
-            </NavButton>
-            <NavButton handler={() => {}}>
+            </NavLink>
+            <NavButton>
               <img src="/assets/heart.svg" alt="" />
             </NavButton>
             <NavButton>

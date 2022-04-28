@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 import styles from "./Auth.module.css";
-import bcrypts from "bcryptjs";
+import { firebase, db } from "../../firebaseConfig";
 import {
   collection,
   addDoc,
@@ -10,10 +10,9 @@ import {
   setDoc,
 } from "firebase/firestore";
 //eslint-disable-next-line
-import { firebase, db } from "../../firebaseConfig";
+
 import {
   getAuth,
-  signInWithPopup,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,

@@ -5,10 +5,11 @@ import LogoutModal from "../components/LogoutModal/LogoutModal";
 import Navbar from "../components/Navbar/Navbar";
 import Post from "../components/Post/Post";
 import styles from "../styles/Home.module.css";
+import { firebase } from "../firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import getAllPosts from "../utils/getAllPosts";
 import BlankPostCard from "../components/BlankPostCard/BlankPostCard";
-import { firebase } from "../firebaseConfig";
+
 import {
   collection,
   query,

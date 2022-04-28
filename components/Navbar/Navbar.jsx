@@ -4,11 +4,12 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { GrSettingsOption } from "react-icons/gr";
 import { BsBookmark } from "react-icons/bs";
 import { MdRestartAlt } from "react-icons/md";
+import { FiInstagram } from "react-icons/fi";
 import Link from "next/link";
 
 function NavButton({ children, handler }) {
   return (
-    <div className={styles.menu_btn_item} onClick={() => handler(true)}>
+    <div className={`${styles.menu_btn_item}`} onClick={() => handler(true)}>
       {children}
     </div>
   );
@@ -22,8 +23,18 @@ function Navbar({ setLogout, user, setNewPost }) {
         <div className={styles.nav_main}>
           <div className="brand-logo">
             <Link href="/">
-              <a>
+              <a className={styles.logo_large}>
                 <img src="/assets/insta_logo.png" alt="" />
+              </a>
+            </Link>
+            <Link href="/">
+              <a className={styles.logo_mobile}>
+                <FiInstagram
+                  style={{
+                    width: 28,
+                    height: 28,
+                  }}
+                />
               </a>
             </Link>
           </div>

@@ -18,6 +18,13 @@
     padding: 0 20px;
     
 }
+.logo_large{
+    display: none;
+}
+
+.logo_mobile{
+    display: block;
+}
 .nav_main{
     width:100%;
     height: 100%;
@@ -120,4 +127,13 @@
     align-items: center;
     width:90%;
     padding:5px 12px;
+}
+
+@media screen and (min-width:475px){
+    .logo_mobile{
+        display: none;
+    }
+    .logo_large{
+        display: block;
+    }
 }

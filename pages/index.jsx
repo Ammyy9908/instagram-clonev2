@@ -135,7 +135,7 @@ export default function Home() {
               )}
             </div>
           </div>
-          <div className={`${styles.primary_secondary} hidden lg:block`}>
+          <div className={`${styles.primary_secondary}`}>
             {user && (
               <div className={styles.app_user_home_container}>
                 <div className={`${styles.app_home_user_avatar}`}>

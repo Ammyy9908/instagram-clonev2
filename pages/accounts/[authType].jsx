@@ -2,13 +2,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import styles from "./Auth.module.css";
 import { firebase, db } from "../../firebaseConfig";
-import {
-  collection,
-  addDoc,
-  doc,
-  getFirestore,
-  setDoc,
-} from "firebase/firestore";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
 //eslint-disable-next-line
 
 import {
@@ -44,26 +38,6 @@ function Auth() {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState(false);
 
-  // detect user auth state changes
-
-  React.useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        console.log(user);
-        if (user) {
-          router.push("/");
-        }
-        // ...
-      } else {
-        // User is signed out
-        // ...
-        console.log("user is signed out");
-      }
-    });
-  }, []);
-
   const handleCreate = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
@@ -77,6 +51,7 @@ function Auth() {
       })
       .catch((error) => {
         const errorCode = error.code;
+        console.log("Error while Creating ", error);
         if (errorCode === "auth/email-already-in-use") {
           setError({ message: "Email already in use" });
           setEmail("");
@@ -101,6 +76,7 @@ function Auth() {
       });
   };
   async function createNewUserData(user) {
+    console.log("User after Creating", user);
     const collectionRef = doc(database, "users", user.uid);
     let ip = await fetch("https://api.ipify.org/?format=json");
     let ipData = await ip.json();
@@ -118,7 +94,6 @@ function Auth() {
     })
       .then(function (docRef) {
         console.log(docRef);
-        console.log("Document written with ID: ", docRef.id);
       })
       .catch(function (error) {
         console.error("Error adding document: ", error);

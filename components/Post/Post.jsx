@@ -47,7 +47,7 @@ function Post({ image, time, lat, long, uid, id, u }) {
       .catch((e) => console.log(e));
 
     // get all likes for the post
-    getPostLikes(id, u.uid)
+    getPostLikes(id, u && u.uid)
       .then((d) => {
         setLikes(d.likes);
         if (d.pos) {

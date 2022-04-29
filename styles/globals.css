@@ -13,6 +13,23 @@ body {
  display: none;
 }
 
+.animated{
+  animation:roll .6s ease-in-out infinite;
+  }
+  
+  @keyframes roll{
+    0%{
+        transform:translate(-50%,-50%) rotate(0deg);
+    }
+     100%{
+        transform:translate(-50%,-50%) rotate(360deg);
+    }
+}
+
+.tick_mark_enable{
+  transform: translate(-50%,-50%) scale(1) !important;
+  opacity: 1 !important;
+}
 *{
   margin: 0;
   padding:0;

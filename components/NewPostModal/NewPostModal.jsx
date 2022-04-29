@@ -51,6 +51,9 @@ function NewPostModal({ user, coords, setNewPost }) {
   const [image, setImage] = React.useState(null);
   const [file, setFile] = React.useState(null);
   const [image_url, setUrl] = React.useState(null);
+  const [animated, setAnimated] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const [done, setDone] = React.useState(false);
   const handleFile = (e) => {
     e.preventDefault();
     const file = e.target.files[0];
@@ -87,6 +90,8 @@ function NewPostModal({ user, coords, setNewPost }) {
   const uploadFile = (file) => {
     const storageRef = ref(storage, `photos/${user.uid}/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
+    setUploading(true);
+    setAnimated(true);
 
     uploadTask.on(
       "state_changed",
@@ -112,7 +117,6 @@ function NewPostModal({ user, coords, setNewPost }) {
         // Handle successful uploads on complete
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log("File available at", downloadURL);
           const new_post = {
             caption,
             image_path: downloadURL,
@@ -124,7 +128,12 @@ function NewPostModal({ user, coords, setNewPost }) {
           };
           uploadPost(new_post)
             .then((res) => {
-              setNewPost(false);
+              setAnimated(false);
+              setDone(true);
+              setTimeout(() => {
+                setDone(false);
+                setNewPost(false);
+              }, 3000);
             })
             .catch((e) => {
               console.log(e);
@@ -168,30 +177,63 @@ function NewPostModal({ user, coords, setNewPost }) {
               </form>
             </div>
           ) : (
-            <div className={styles.modal_post_seclection}>
-              <div className={styles.post_image_preview}>
-                <img src={image} alt="" />
-              </div>
-              <div className={styles.new_post_controls}>
-                <div className={styles.post_user_header}>
-                  <div className={styles.post_user_avatar}></div>
-                  <h3>Sumit Bighaniya</h3>
+            <>
+              {!uploading ? (
+                <div className={styles.modal_post_seclection}>
+                  <div className={styles.post_image_preview}>
+                    <img src={image} alt="" />
+                  </div>
+                  <div className={styles.new_post_controls}>
+                    <div className={styles.post_user_header}>
+                      <div className={styles.post_user_avatar}></div>
+                      <h3>Sumit Bighaniya</h3>
+                    </div>
+                    <textarea
+                      name="caption"
+                      id="caption"
+                      rows="10"
+                      placeholder="Write a caption...."
+                      value={caption}
+                      style={{ width: "100%", outline: "none" }}
+                      onChange={(e) => setCaption(e.target.value)}
+                    ></textarea>
+                    <div className={styles.cation_emoji_container}>
+                      <div></div>
+                      <span>{caption.length}/2,200</span>
+                    </div>
+                  </div>
                 </div>
-                <textarea
-                  name="caption"
-                  id="caption"
-                  rows="10"
-                  placeholder="Write a caption...."
-                  value={caption}
-                  style={{ width: "100%", outline: "none" }}
-                  onChange={(e) => setCaption(e.target.value)}
-                ></textarea>
-                <div className={styles.cation_emoji_container}>
-                  <div></div>
-                  <span>{caption.length}/2,200</span>
+              ) : (
+                <div className={styles.post_loader}>
+                  <div
+                    className={`${styles.loader_circle} ${
+                      animated && "animated"
+                    }`}
+                  >
+                    <div className={styles.loader_inner_circle}>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className={`${styles.tick_mark} ${
+                          done && "tick_mark_enable"
+                        }`}
+                      >
+                        <defs>
+                          <linearGradient id="MyGradient">
+                            <stop offset="0%" stopColor="#405de6"></stop>
+                            <stop offset="80%" stopColor="#c13584"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path
+                          d="M9 22l-10-10.598 2.798-2.859 7.149 7.473 13.144-14.016 2.909 2.806z"
+                          className={`${styles.tick_path}`}
+                        />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
         </div>
       </div>

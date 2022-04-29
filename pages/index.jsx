@@ -22,6 +22,7 @@ import { useRouter } from "next/router";
 import NewPostModal from "../components/NewPostModal/NewPostModal";
 import RefreshToast from "../components/RefreshToast/RefreshToast";
 import useChats from "../hooks/useChats";
+import updateStatus from "../utils/updateStatus";
 const auth = getAuth();
 const db = getFirestore();
 export default function Home() {
@@ -45,6 +46,11 @@ export default function Home() {
         console.log(user);
         const u = await getCurrentUserData(uid);
         setUser(u);
+        updateStatus(u.uid, "online")
+          .then((done) => {
+            console.log("User Online", done);
+          })
+          .catch((e) => console.log(e));
         // ...
       } else {
         // User is signed out
@@ -163,7 +169,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {logout && <LogoutModal />}
+      {logout && <LogoutModal user={user && user} />}
       {newPost && (
         <NewPostModal
           user={user && user}

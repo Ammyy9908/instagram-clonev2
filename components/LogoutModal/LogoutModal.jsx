@@ -3,8 +3,9 @@ import React from "react";
 import styles from "./LogoutModal.module.css";
 import { getAuth, signOut } from "firebase/auth";
 import { firebase, db } from "../../firebaseConfig";
+import updateStatus from "../../utils/updateStatus";
 
-function LogoutModal() {
+function LogoutModal({ user }) {
   const router = useRouter();
   const auth = getAuth();
 
@@ -12,6 +13,11 @@ function LogoutModal() {
     signOut(auth)
       .then(() => {
         console.log("loggedout");
+        updateStatus(user.uid, "offline")
+          .then((done) => {
+            console.log("User Online", done);
+          })
+          .catch((e) => console.log(e));
         router.push("/accounts/login");
       })
       .catch((e) => {

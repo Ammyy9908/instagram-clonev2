@@ -92,6 +92,7 @@ function Auth() {
       last_ip: ipAddress,
       created_at: new Date(),
       updated_at: new Date(),
+      status: "online",
     })
       .then(function (docRef) {
         console.log(docRef);

@@ -1,3 +1,4 @@
+import { firebase } from "../firebaseConfig";
 import {
   collection,
   getFirestore,

@@ -1,3 +1,4 @@
+import { firebase } from "../firebaseConfig";
 import {
   collection,
   query,
@@ -5,7 +6,7 @@ import {
   getDocs,
   getFirestore,
 } from "firebase/firestore";
-import { firebase } from "../firebaseConfig";
+
 const db = getFirestore();
 const getUserChats = async (uid, friend_id) => {
   const from_chats = query(

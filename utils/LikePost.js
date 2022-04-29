@@ -1,5 +1,6 @@
-import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase } from "../firebaseConfig";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
+
 // Add a new document in collection "cities"
 const db = getFirestore();
 const LikePost = async (user, post_id) => {

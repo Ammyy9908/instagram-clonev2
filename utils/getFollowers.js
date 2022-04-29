@@ -1,3 +1,4 @@
+import { firebase } from "../firebaseConfig";
 import {
   collection,
   query,
@@ -5,8 +6,6 @@ import {
   onSnapshot,
   getFirestore,
 } from "firebase/firestore";
-
-import { firebase } from "../firebaseConfig";
 
 const db = getFirestore();
 const getFollowers = async (uid) => {

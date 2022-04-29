@@ -1,5 +1,6 @@
-import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { firebase } from "../firebaseConfig";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+
 const db = getFirestore();
 const getPost = async (post_id) => {
   const docRef = doc(db, "photos", post_id);

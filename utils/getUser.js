@@ -1,5 +1,5 @@
-import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { firebase } from "../firebaseConfig";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 const getCurrentUserData = async (uid) => {
   const database = getFirestore();

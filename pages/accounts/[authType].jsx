@@ -95,6 +95,7 @@ function Auth() {
     })
       .then(function (docRef) {
         console.log(docRef);
+        router.push("/");
       })
       .catch(function (error) {
         console.error("Error adding document: ", error);

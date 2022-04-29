@@ -14,6 +14,7 @@ import getPostLikes from "../../utils/getPostLikes";
 import addComment from "../../utils/addComment";
 import useComments from "../../hooks/useComments";
 import getComment from "../../utils/getComment";
+import useLikes from "../../hooks/useLikes";
 TimeAgo.addDefaultLocale(en);
 
 function Post({ image, time, lat, long, uid, id, u }) {
@@ -24,12 +25,12 @@ function Post({ image, time, lat, long, uid, id, u }) {
   const [user, setUser] = React.useState(false);
   const [bookmarked, setBookmarked] = React.useState(false);
   const [like_count, setLikeCount] = React.useState(null);
-  const [likes, setLikes] = React.useState(null);
   const [comment, setComment] = React.useState("");
   const [photo_comments, setPhotoComments] = React.useState(null);
   const [latestComment, setLatestComment] = React.useState(null);
 
   const cmts = useComments(id);
+  const likes = useLikes(id);
 
   React.useEffect(() => {
     getLocation(lat, long)
@@ -45,19 +46,6 @@ function Post({ image, time, lat, long, uid, id, u }) {
         setUser(user);
       })
       .catch((e) => console.log(e));
-
-    // get all likes for the post
-    getPostLikes(id, u && u.uid)
-      .then((d) => {
-        setLikes(d.likes);
-        if (d.pos) {
-          setPostLiked(true);
-        }
-        setLikeCount(d.likes.length);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
 
     cmts.length > 0 &&
       getComment(cmts[cmts.length - 1].comment_id).then((d) => {
@@ -220,7 +208,7 @@ function Post({ image, time, lat, long, uid, id, u }) {
             }}
             className="text-xs"
           >
-            <strong>{like_count}</strong>
+            <strong>{likes.length}</strong>
             <p>Likes</p>
           </span>
         </div>

@@ -84,7 +84,7 @@ function Auth() {
     let ipAddress = ipData.ip;
     setDoc(collectionRef, {
       saved_posts: [],
-      avatar: "null",
+      avatar: `https://avatars.dicebear.com/api/micah/${name}.svg`,
       uid: user.uid,
       email: user.email,
       username: username,

@@ -115,20 +115,18 @@ function Post({ image, time, lat, long, uid, id, u }) {
         <div className={styles.post_header_wrapper}>
           <div className={styles.header_content}>
             <div className="flex gap-5">
-              <div className={styles.post_avatar_cirlce}>
-                <div className={styles.post_avatar_ellipse}>
-                  <img
-                    src={
-                      user && user.avatar !== "null"
-                        ? user.avatar
-                        : "https://images.unsplash.com/photo-1502033303885-c6e0280a4f5c?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=9be99762d86ae47ab59690f72d984be6"
-                    }
-                    alt="some-text"
-                    width={50}
-                    height={50}
-                  />
+              {user && user.avatar && (
+                <div className={styles.post_avatar_cirlce}>
+                  <div className={styles.post_avatar_ellipse}>
+                    <img
+                      src={user.avatar}
+                      alt="some-text"
+                      width={50}
+                      height={50}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
               <div className={styles.post_meta}>
                 {user && <p>{user.name}</p>}
                 {location && (

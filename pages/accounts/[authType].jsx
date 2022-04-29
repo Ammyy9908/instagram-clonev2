@@ -70,6 +70,7 @@ function Auth() {
     signInWithEmailAndPassword(auth, email, password)
       .then((user) => {
         console.log(user);
+        router.push("/");
       })
       .catch((e) => {
         console.log(e);

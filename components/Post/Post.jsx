@@ -30,8 +30,9 @@ function Post({ image, time, lat, long, uid, id, u }) {
   const [latestComment, setLatestComment] = React.useState(null);
 
   const cmts = useComments(id);
-  const likes = useLikes(id);
 
+  const { likes, index } = useLikes(id, u.uid);
+  console.log(index, likes);
   React.useEffect(() => {
     getLocation(lat, long)
       .then((data) => {
@@ -39,6 +40,12 @@ function Post({ image, time, lat, long, uid, id, u }) {
         setLocation(results[0].displayAddress);
       })
       .catch((e) => console.log(e));
+    if (index >= 0) {
+      console.log(index);
+      setPostLiked(true);
+    } else {
+      setPostLiked(false);
+    }
 
     // get user of the post
     getCurrentUserData(uid)
@@ -57,7 +64,7 @@ function Post({ image, time, lat, long, uid, id, u }) {
 
     isSaved();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid, cmts]);
+  }, [uid, cmts, likes, index]);
 
   const handlePostSave = () => {
     savePost(user, id)

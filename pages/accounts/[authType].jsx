@@ -93,6 +93,7 @@ function Auth() {
       created_at: new Date(),
       updated_at: new Date(),
       status: "online",
+      contacts: [],
     })
       .then(function (docRef) {
         console.log(docRef);

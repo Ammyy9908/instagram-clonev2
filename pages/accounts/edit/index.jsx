@@ -11,12 +11,16 @@ import getCurrentUserData from "../../../utils/getUser";
 import updateProfile from "../../../utils/updateUserProfile";
 import styles from "./edit.module.css";
 import { GrClose } from "react-icons/gr";
+import GoogleLogin from "react-google-login";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
+import loadContacts from "../../../utils/loadContacts";
+import saveContacts from "../../../utils/saveContacts";
+import removeContacts from "../../../utils/removeContacts";
 
 function SnackBar({ saved, setSaved }) {
   React.useEffect(() => {
@@ -255,6 +259,7 @@ function index() {
   const [saved, setSaved] = React.useState(false);
   const [customGender, setCustomGender] = React.useState("");
   const [active_tab, setTab] = React.useState(6);
+  const [contacts, setContacts] = React.useState([]);
 
   const user = useAuth();
   console.log("User Updated", user);
@@ -272,6 +277,7 @@ function index() {
         setBio(u.bio ? u.bio : "");
         setGender(u.gender ? u.gender : 0);
         setAvatar(u.avatar);
+        setContacts(u.contacts);
         setSimilar(u.similar ? u.similar : false);
       });
     }
@@ -381,6 +387,40 @@ function index() {
 
   console.log(gender === 2 && customGender);
   let genders = ["Male", "Female", customGender, "Not Prefer To Say"];
+
+  const getContacts = (token) => {
+    loadContacts(token)
+      .then((r) => {
+        console.log(r);
+        const { connections } = r;
+        const contacts = connections.map((connection) => {
+          return {
+            phone: connection.phoneNumbers[0].value,
+            uname: connection.names[0].displayName,
+          };
+        });
+        console.log("Contacts", contacts);
+        setContacts(contacts);
+        saveContacts(user_data.uid, contacts)
+          .then((done) => {
+            if (done) {
+              setSaved({ message: "Successfully Contacts Updated" });
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const responseGoogle = (response) => {
+    console.log(response);
+    const { accessToken } = response;
+    getContacts(accessToken);
+  };
 
   return (
     <div>
@@ -687,12 +727,78 @@ function index() {
                 <div className={styles.profile_contact_body}>
                   <div className={styles.profile_contact_wrapper}>
                     <h2>Manage Contacts</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Placeat iste debitis aut earum ipsa accusantium ipsam id,
-                      velit eos consectetur? Ullam maxime iure culpa nemo porro,
-                      harum voluptates ipsum saepe.
+                    <p className="mt-3">
+                      The people listed here are contacts that you`ve uploaded
+                      to NextInsta. To remove your synced contacts, tap Delete
+                      All. Your contacts will be re-uploaded the next time
+                      Instagram syncs your contacts unless you go to your device
+                      settings and turn off access to contacts.
                     </p>
+                    <p className="mt-5">
+                      Only you can see your contacts, but Instagram uses the
+                      information you`ve uploaded about your contacts to make
+                      friend suggestions for you and others and to provide a
+                      better experience for everyone.
+                    </p>
+
+                    {contacts.length <= 0 && (
+                      <GoogleLogin
+                        clientId="854383202900-6jf6e8dt9bo2055tl3mdvq6jebc3kmae.apps.googleusercontent.com"
+                        render={(renderProps) => (
+                          <button
+                            onClick={renderProps.onClick}
+                            disabled={renderProps.disabled}
+                            className={styles.google_contact_load_btn}
+                          >
+                            Load Contacts
+                          </button>
+                        )}
+                        buttonText="Login"
+                        onSuccess={responseGoogle}
+                        onFailure={responseGoogle}
+                        cookiePolicy={"single_host_origin"}
+                        scope="https://www.googleapis.com/auth/contacts.readonly"
+                      />
+                    )}
+
+                    {user_data && contacts.length > 0 && (
+                      <div className={`${styles.contacts_wrapper} mt-5`}>
+                        <div className={`${styles.contact_wrapper_header}`}>
+                          <h3>{user_data.contacts.length} synced contacts</h3>
+                          <button
+                            onClick={() => {
+                              removeContacts(user_data.uid)
+                                .then((done) => {
+                                  if (done) {
+                                    setSaved({
+                                      message:
+                                        "Successfully removed all contacts",
+                                    });
+                                    setContacts([]);
+                                  }
+                                })
+                                .catch((e) => {
+                                  setSaved({
+                                    message: "Something went wrong",
+                                  });
+                                });
+                            }}
+                          >
+                            Delete all
+                          </button>
+                        </div>
+                        <div className={styles.contact_list}>
+                          {user_data.contacts.map((contact, i) => {
+                            return (
+                              <div className={styles.contact} key={i}>
+                                <h3>{contact.uname}</h3>
+                                <p>{contact.phone}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

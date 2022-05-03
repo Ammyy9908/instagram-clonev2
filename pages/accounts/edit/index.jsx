@@ -254,7 +254,7 @@ function index() {
   const router = useRouter();
   const [saved, setSaved] = React.useState(false);
   const [customGender, setCustomGender] = React.useState("");
-  const [active_tab, setTab] = React.useState(0);
+  const [active_tab, setTab] = React.useState(6);
 
   const user = useAuth();
   console.log("User Updated", user);
@@ -396,36 +396,104 @@ function index() {
             <div className={styles.edit_options}>
               <ul className={styles.settings_container}>
                 <li>
-                  <a href="#" className={active_tab === 0 && styles.active_tab}>
+                  <button
+                    className={active_tab === 1 && styles.active_tab}
+                    onClick={() => {
+                      setTab(1);
+                    }}
+                  >
                     Edit Profile
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Professional Account</a>
+                  <button
+                    className={active_tab === 2 && styles.active_tab}
+                    onClick={() => {
+                      setTab(2);
+                    }}
+                  >
+                    Professional Account
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Change Password</a>
+                  <button
+                    className={active_tab === 3 && styles.active_tab}
+                    onClick={() => {
+                      setTab(3);
+                    }}
+                  >
+                    Change Password
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Email notifications</a>
+                  <button
+                    className={active_tab === 4 && styles.active_tab}
+                    onClick={() => {
+                      setTab(4);
+                    }}
+                  >
+                    Email notifications
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Push notifications</a>
+                  <button
+                    className={active_tab === 5 && styles.active_tab}
+                    onClick={() => {
+                      setTab(5);
+                    }}
+                  >
+                    Push notifications
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Manage contacts</a>
+                  <button
+                    className={active_tab === 6 && styles.active_tab}
+                    onClick={() => {
+                      setTab(6);
+                    }}
+                  >
+                    Manage contacts
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Privacy and Security</a>
+                  <button
+                    className={active_tab === 7 && styles.active_tab}
+                    onClick={() => {
+                      setTab(7);
+                    }}
+                  >
+                    Privacy and Security
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Login activity</a>
+                  <button
+                    className={active_tab === 8 && styles.active_tab}
+                    onClick={() => {
+                      setTab(8);
+                    }}
+                  >
+                    Login activity
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Email from NextInsta</a>
+                  <button
+                    className={active_tab === 9 && styles.active_tab}
+                    onClick={() => {
+                      setTab(9);
+                    }}
+                  >
+                    Email from NextInsta
+                  </button>
                 </li>
                 <li>
-                  <a href="#">Help</a>
+                  <button
+                    className={active_tab === 10 && styles.active_tab}
+                    onClick={() => {
+                      setTab(10);
+                    }}
+                  >
+                    Help
+                  </button>
                 </li>
                 <div className={styles.professional_account_switcher}>
                   <div className={styles.professional_account_switcher_content}>
@@ -453,157 +521,181 @@ function index() {
               </ul>
             </div>
             <div className={styles.setting_body}>
-              <div className={styles.profile_setting_body}>
-                <div className={styles.profile_setting_header}>
-                  <div className={styles.profile_setting_header_avatar_wrapper}>
-                    <div className={styles.profile_header_avatar}>
-                      <button>
-                        {user_data && (
-                          <img src={image ? image : user_data.avatar} alt="" />
-                        )}
-                      </button>
+              {active_tab === 1 && (
+                <div className={styles.profile_setting_body}>
+                  <div className={styles.profile_setting_header}>
+                    <div
+                      className={styles.profile_setting_header_avatar_wrapper}
+                    >
+                      <div className={styles.profile_header_avatar}>
+                        <button>
+                          {user_data && (
+                            <img
+                              src={image ? image : user_data.avatar}
+                              alt=""
+                            />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div className={styles.profile_user_information}>
+                      <h1 className={styles.profile_seeting_user_name}>
+                        sumitbighaniya
+                      </h1>
+
+                      <label
+                        htmlFor="file"
+                        className={styles.profile_change_btn}
+                      >
+                        <input
+                          type="file"
+                          name="file"
+                          id="file"
+                          onChange={handleFile}
+                        />
+                        <span>Change Profile Photo</span>
+                      </label>
                     </div>
                   </div>
-                  <div className={styles.profile_user_information}>
-                    <h1 className={styles.profile_seeting_user_name}>
-                      sumitbighaniya
-                    </h1>
+                  <form
+                    action=""
+                    className={styles.user_profile_edit_form}
+                    onSubmit={uploadProfile}
+                  >
+                    <FormControlBox
+                      id="person_name"
+                      placeholder="Person Name"
+                      value={person_name}
+                      setValue={setPersonName}
+                      form_type="single"
+                      type="text"
+                      label="Name"
+                      disabled={true}
+                      setChange={setChange}
+                      change={changed}
+                    />
+                    <FormControlBox
+                      id="uname"
+                      placeholder="Username"
+                      value={uname}
+                      setValue={setUname}
+                      form_type="single"
+                      type="text"
+                      label="Username"
+                      setChange={setChange}
+                      change={changed}
+                    />
+                    <FormControlBox
+                      id="website"
+                      placeholder="Website"
+                      value={website}
+                      setValue={setWebsite}
+                      form_type="single"
+                      type="text"
+                      label="Website"
+                      setChange={setChange}
+                      change={changed}
+                    />
+                    <FormControlBox
+                      id="bio"
+                      placeholder="Bio"
+                      value={bio}
+                      setValue={setBio}
+                      form_type="multi"
+                      type="text"
+                      label="Bio"
+                      setChange={setChange}
+                      change={changed}
+                    />
+                    <FormControlBox
+                      id="email"
+                      placeholder="Email address"
+                      value={email}
+                      setValue={setEmail}
+                      form_type="single"
+                      type="email"
+                      label="Email address"
+                      setChange={setChange}
+                      change={changed}
+                    />
+                    <FormControlBox
+                      id="phone"
+                      placeholder="Phone number"
+                      value={phone}
+                      setValue={setPhone}
+                      form_type="single"
+                      type="text"
+                      label="Phone number"
+                      setChange={setChange}
+                      change={changed}
+                    />
 
-                    <label htmlFor="file" className={styles.profile_change_btn}>
+                    <div className={styles.form_choice_controller}>
+                      <aside>
+                        <label htmlFor="gender">Gender</label>
+                      </aside>
+                      <div className={styles.choice_controller}>
+                        <div
+                          className={styles.choice_selector}
+                          onClick={() => setGenderModal(true)}
+                        >
+                          <p>{genders[gender]}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.form_choice_controller}>
+                      <aside>
+                        <label htmlFor="similar">
+                          Similar account suggestions
+                        </label>
+                      </aside>
+
+                      <div className={styles.choice_controller}>
+                        <div className="checked_input">
+                          <input
+                            type="checkbox"
+                            name="similar"
+                            id="similar"
+                            onChange={(e) => {
+                              setChange(true);
+                              setSimilar(!similar);
+                            }}
+                            checked={similar}
+                          />
+                          <p>
+                            Include your account when recommending similar
+                            accounts that people might want to follow
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.form_submit_controller}>
                       <input
-                        type="file"
-                        name="file"
-                        id="file"
-                        onChange={handleFile}
+                        type="submit"
+                        value="Submit"
+                        className={!changed ? styles.disabled : null}
                       />
-                      <span>Change Profile Photo</span>
-                    </label>
+                      <button>Temporarily disable my account</button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {active_tab === 6 && (
+                <div className={styles.profile_contact_body}>
+                  <div className={styles.profile_contact_wrapper}>
+                    <h2>Manage Contacts</h2>
+                    <p>
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Placeat iste debitis aut earum ipsa accusantium ipsam id,
+                      velit eos consectetur? Ullam maxime iure culpa nemo porro,
+                      harum voluptates ipsum saepe.
+                    </p>
                   </div>
                 </div>
-                <form
-                  action=""
-                  className={styles.user_profile_edit_form}
-                  onSubmit={uploadProfile}
-                >
-                  <FormControlBox
-                    id="person_name"
-                    placeholder="Person Name"
-                    value={person_name}
-                    setValue={setPersonName}
-                    form_type="single"
-                    type="text"
-                    label="Name"
-                    disabled={true}
-                    setChange={setChange}
-                    change={changed}
-                  />
-                  <FormControlBox
-                    id="uname"
-                    placeholder="Username"
-                    value={uname}
-                    setValue={setUname}
-                    form_type="single"
-                    type="text"
-                    label="Username"
-                    setChange={setChange}
-                    change={changed}
-                  />
-                  <FormControlBox
-                    id="website"
-                    placeholder="Website"
-                    value={website}
-                    setValue={setWebsite}
-                    form_type="single"
-                    type="text"
-                    label="Website"
-                    setChange={setChange}
-                    change={changed}
-                  />
-                  <FormControlBox
-                    id="bio"
-                    placeholder="Bio"
-                    value={bio}
-                    setValue={setBio}
-                    form_type="multi"
-                    type="text"
-                    label="Bio"
-                    setChange={setChange}
-                    change={changed}
-                  />
-                  <FormControlBox
-                    id="email"
-                    placeholder="Email address"
-                    value={email}
-                    setValue={setEmail}
-                    form_type="single"
-                    type="email"
-                    label="Email address"
-                    setChange={setChange}
-                    change={changed}
-                  />
-                  <FormControlBox
-                    id="phone"
-                    placeholder="Phone number"
-                    value={phone}
-                    setValue={setPhone}
-                    form_type="single"
-                    type="text"
-                    label="Phone number"
-                    setChange={setChange}
-                    change={changed}
-                  />
-
-                  <div className={styles.form_choice_controller}>
-                    <aside>
-                      <label htmlFor="gender">Gender</label>
-                    </aside>
-                    <div className={styles.choice_controller}>
-                      <div
-                        className={styles.choice_selector}
-                        onClick={() => setGenderModal(true)}
-                      >
-                        <p>{genders[gender]}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.form_choice_controller}>
-                    <aside>
-                      <label htmlFor="similar">
-                        Similar account suggestions
-                      </label>
-                    </aside>
-
-                    <div className={styles.choice_controller}>
-                      <div className="checked_input">
-                        <input
-                          type="checkbox"
-                          name="similar"
-                          id="similar"
-                          onChange={(e) => {
-                            setChange(true);
-                            setSimilar(!similar);
-                          }}
-                          checked={similar}
-                        />
-                        <p>
-                          Include your account when recommending similar
-                          accounts that people might want to follow
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.form_submit_controller}>
-                    <input
-                      type="submit"
-                      value="Submit"
-                      className={!changed ? styles.disabled : null}
-                    />
-                    <button>Temporarily disable my account</button>
-                  </div>
-                </form>
-              </div>
+              )}
             </div>
           </div>
         </div>

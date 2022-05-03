@@ -222,7 +222,7 @@ cursor: pointer;
 }
 
 
-.form_control_input_helper input{
+.form_control_input_helper input,.form_control_input_helper textarea{
     background-color: #fff;
     border: 1px solid #dbdbdb;
     color: #8e8e8e;
@@ -231,6 +231,10 @@ cursor: pointer;
     height: 32px;
     padding: 0 10px;
     width: 100%;
+}
+.form_control_input_helper textarea{
+    height: 32px;
+    min-height: 90px;
 }
 .disabled{
     background-color: #efefef !important;

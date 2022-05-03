@@ -741,7 +741,7 @@ function index() {
                       better experience for everyone.
                     </p>
 
-                    {contacts.length <= 0 && (
+                    {contacts && contacts.length <= 0 && (
                       <GoogleLogin
                         clientId="854383202900-6jf6e8dt9bo2055tl3mdvq6jebc3kmae.apps.googleusercontent.com"
                         render={(renderProps) => (
@@ -761,7 +761,7 @@ function index() {
                       />
                     )}
 
-                    {user_data && contacts.length > 0 && (
+                    {user_data && contacts && contacts.length > 0 && (
                       <div className={`${styles.contacts_wrapper} mt-5`}>
                         <div className={`${styles.contact_wrapper_header}`}>
                           <h3>{user_data.contacts.length} synced contacts</h3>

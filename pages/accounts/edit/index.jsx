@@ -743,7 +743,7 @@ function index() {
 
                     {contacts && contacts.length <= 0 && (
                       <GoogleLogin
-                        clientId="854383202900-6jf6e8dt9bo2055tl3mdvq6jebc3kmae.apps.googleusercontent.com"
+                        clientId="854383202900-nmfjq1rahjr83kh138am84fucmiuj694.apps.googleusercontent.com"
                         render={(renderProps) => (
                           <button
                             onClick={renderProps.onClick}
@@ -756,7 +756,6 @@ function index() {
                         buttonText="Login"
                         onSuccess={responseGoogle}
                         onFailure={responseGoogle}
-                        cookiePolicy={"single_host_origin"}
                         scope="https://www.googleapis.com/auth/contacts.readonly"
                       />
                     )}

@@ -142,8 +142,18 @@ function NewPostModal({ user, coords, setNewPost }) {
       }
     );
   };
+
+  const handleClose = (e) => {
+    const target = e.target;
+    if (target.classList.contains("new_post_popup")) {
+      setNewPost(false);
+    }
+  };
   return (
-    <div className={styles.new_post_popup}>
+    <div
+      className={`${styles.new_post_popup} new_post_popup`}
+      onClick={handleClose}
+    >
       <div className={styles.new_post_modal}>
         <div className={styles.new_post_modal_header}>
           <h3>Create a new post</h3>

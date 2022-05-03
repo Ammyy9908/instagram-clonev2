@@ -101,28 +101,34 @@ function Navbar({ setLogout, user, setNewPost }) {
                   <div className={styles.user_dropdown}>
                     <ul className={styles.user_dropdown_list}>
                       <li>
-                        <a href="#">
-                          <span>
-                            <FaRegUserCircle />
-                          </span>
-                          Profile
-                        </a>
+                        <Link href={`/u/${user && user.uid}`}>
+                          <a>
+                            <span>
+                              <FaRegUserCircle />
+                            </span>
+                            Profile
+                          </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="#">
-                          <span>
-                            <BsBookmark />
-                          </span>
-                          Saved
-                        </a>
+                        <Link href={`/u/${user && user.uid}/saved`}>
+                          <a>
+                            <span>
+                              <BsBookmark />
+                            </span>
+                            Saved
+                          </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="#">
-                          <span>
-                            <GrSettingsOption />
-                          </span>
-                          Settings
-                        </a>
+                        <Link href="/accounts/edit">
+                          <a>
+                            <span>
+                              <GrSettingsOption />
+                            </span>
+                            Settings
+                          </a>
+                        </Link>
                       </li>
                       <li>
                         <a href="#">

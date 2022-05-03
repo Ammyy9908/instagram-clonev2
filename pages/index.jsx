@@ -9,7 +9,9 @@ import { firebase } from "../firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import getAllPosts from "../utils/getAllPosts";
 import BlankPostCard from "../components/BlankPostCard/BlankPostCard";
-
+import getMyIp from "../utils/getIp";
+import updateLastIp from "../utils/updateLastIp";
+import useUnload from "../hooks/useUnload";
 import {
   collection,
   query,
@@ -23,8 +25,11 @@ import NewPostModal from "../components/NewPostModal/NewPostModal";
 import RefreshToast from "../components/RefreshToast/RefreshToast";
 import useChats from "../hooks/useChats";
 import updateStatus from "../utils/updateStatus";
+import { getDatabase, ref, onDisconnect } from "firebase/database";
 const auth = getAuth();
 const db = getFirestore();
+const realtime_db = getDatabase();
+const presenceRef = ref(realtime_db, "disconnectmessage");
 export default function Home() {
   const [logout, setLogout] = React.useState(false);
   const [user, setUser] = React.useState(false);
@@ -33,10 +38,19 @@ export default function Home() {
   const [coords, setCoords] = React.useState(null);
   const [refresh, setRefresh] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [ip, setIp] = React.useState(null);
 
   const router = useRouter();
   const chats = useChats();
-  console.log("chats", chats);
+
+  useUnload((e) => {
+    e.preventDefault();
+    const exit = confirm("Are you sure you want to leave?");
+    if (exit) window.close();
+  });
+
+  // detect online offline
+  onDisconnect(presenceRef).set("I disconnected!");
   React.useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -51,6 +65,7 @@ export default function Home() {
             console.log("User Online", done);
           })
           .catch((e) => console.log(e));
+
         // ...
       } else {
         // User is signed out
@@ -58,6 +73,23 @@ export default function Home() {
         router.push("/accounts/login");
       }
     });
+
+    getMyIp()
+      .then((ip) => {
+        console.log("My Ip is ", ip);
+        setIp(ip);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    updateLastIp(user.uid, ip)
+      .then((done) => {
+        console.log("updated ip", done);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     // update the user's location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -70,7 +102,7 @@ export default function Home() {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ip]);
 
   React.useEffect(() => {
     getAllPosts()

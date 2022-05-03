@@ -155,7 +155,7 @@ function User() {
           )}
           <div className={styles.profile_user_info}>
             <div className={styles.user_profile_first}>
-              <h3>sumitbighaniya</h3>
+              <h3>{User && User.username}</h3>
               <button className={`${styles.edit_btn} text-sm`}>
                 Edit Profile
               </button>
@@ -178,11 +178,11 @@ function User() {
               </span>
             </div>
             <div className="user-profile-third">
-              <h3 className="font-semibold">Sumit Bighaniya</h3>
+              <h3 className="font-semibold">{User && User.name}</h3>
               <span className="text-gray-600">Education</span>
-              <p>MERN Stack Developer</p>
+              {User && <p>{User.bio}</p>}
               <a href="#" className="text-sky-600">
-                linktr.ee/sumitkumarbig
+                {User && User.website}
               </a>
             </div>
           </div>

@@ -299,6 +299,7 @@ function index() {
       function () {
         // convert image file to base64 string
         setImage(reader.result);
+        setChange(true);
       },
       false
     );

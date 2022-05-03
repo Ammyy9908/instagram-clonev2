@@ -393,6 +393,11 @@ function index() {
       .then((r) => {
         console.log(r);
         const { connections } = r;
+        if (!connections) {
+          return setSaved({
+            message: "No Contacts Found! Choose different google account",
+          });
+        }
         const contacts = connections.map((connection) => {
           return {
             phone: connection.phoneNumbers[0].value,

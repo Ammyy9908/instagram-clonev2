@@ -5,8 +5,12 @@ const db = getFirestore();
 const updateProfile = async (uid, data) => {
   console.log(data);
   const userRef = doc(db, "users", uid);
-  let done = await setDoc(userRef, data, { merge: true });
-  return done;
+  try {
+    await setDoc(userRef, data, { merge: true });
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export default updateProfile;

@@ -21,6 +21,7 @@ import getPost from "../../utils/getPost";
 const auth = getAuth();
 const db = getFirestore();
 import { firebase } from "../../firebaseConfig";
+import Link from "next/link";
 
 function ProfilePost({ image, type, photoId }) {
   const [post, setPost] = React.useState(null);
@@ -156,9 +157,13 @@ function User() {
           <div className={styles.profile_user_info}>
             <div className={styles.user_profile_first}>
               <h3>{User && User.username}</h3>
-              <button className={`${styles.edit_btn} text-sm`}>
-                Edit Profile
-              </button>
+              <Link href="/accounts/edit">
+                <a>
+                  <button className={`${styles.edit_btn} text-sm`}>
+                    Edit Profile
+                  </button>
+                </a>
+              </Link>
               <button className={styles.setting_btn}>
                 <RiSettingsLine />
               </button>

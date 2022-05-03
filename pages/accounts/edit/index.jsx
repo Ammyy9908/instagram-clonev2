@@ -10,12 +10,166 @@ import useAuth from "../../../hooks/useAuth";
 import getCurrentUserData from "../../../utils/getUser";
 import updateProfile from "../../../utils/updateUserProfile";
 import styles from "./edit.module.css";
+import { GrClose } from "react-icons/gr";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
+
+function SnackBar({ saved, setSaved }) {
+  React.useEffect(() => {
+    setTimeout(() => {
+      setSaved(false);
+    }, 5000);
+  }, []);
+  return (
+    <div className={`${styles.snack_bar} ${saved && styles.snack_bar_enable}`}>
+      <p>{saved.message}</p>
+    </div>
+  );
+}
+
+function RadioInput({
+  label,
+  id,
+  value,
+  setValue,
+  gender,
+  setCustomGender,
+  customGender,
+  setChange,
+}) {
+  return (
+    <div htmlFor={id} className={styles.custom_radio}>
+      <label htmlFor={id} className={styles.radio_component}>
+        <input
+          type="radio"
+          name="gender"
+          id={id}
+          checked={value === gender}
+          onChange={(e) => {
+            setValue(value);
+            setChange(true);
+          }}
+        />
+        <div className={styles.custom_radio_box_outer}>
+          <div
+            className={`${styles.custom_radio_inner} ${
+              value === gender && styles.custom_radio_inner_enable
+            }`}
+          ></div>
+        </div>
+        <div className={styles.custom_label}>
+          <span>{label}</span>
+          {value === 2 && gender === 2 && (
+            <input
+              type="text"
+              className={styles.custom_gender_box}
+              placeholder="Custom"
+              value={customGender}
+              onChange={(e) => {
+                if (!changed) {
+                  setChange(true);
+                }
+                setCustomGender(e.target.value);
+              }}
+            />
+          )}
+        </div>
+      </label>
+    </div>
+  );
+}
+
+function GenderSelector({
+  setGender,
+  gender,
+  setGenderModal,
+  setCustomGender,
+  customGender,
+  setChange,
+  changed,
+}) {
+  return (
+    <div
+      className={`${styles.gender_selector} gender_modal`}
+      onClick={(e) => {
+        if (e.target.classList.contains("gender_modal")) {
+          setGenderModal(true);
+        }
+      }}
+    >
+      <div className={styles.gender_Selector_modal}>
+        <div className={styles.gender_selector_header}>
+          <h3>Gender</h3>
+          <button
+            className={styles.modal_close_btn}
+            onClick={() => setGenderModal(false)}
+          >
+            <GrClose />
+          </button>
+        </div>
+        <div className={styles.gender_modal_body}>
+          <div className={styles.gender_options}>
+            <RadioInput
+              value={0}
+              gender={gender}
+              setValue={setGender}
+              id="male"
+              label="Male"
+              setCustomGender={setCustomGender}
+              customGender={customGender}
+              setChange={setChange}
+              changed={changed}
+            />
+            <RadioInput
+              value={1}
+              gender={gender}
+              setValue={setGender}
+              id="female"
+              label="Female"
+              setCustomGender={setCustomGender}
+              customGender={customGender}
+              setChange={setChange}
+              changed={changed}
+            />
+            <RadioInput
+              value={2}
+              gender={gender}
+              setValue={setGender}
+              id="custom"
+              label="Custom"
+              setCustomGender={setCustomGender}
+              customGender={customGender}
+              setChange={setChange}
+              changed={changed}
+            />
+
+            <RadioInput
+              value={3}
+              gender={gender}
+              setValue={setGender}
+              id="not-prefer"
+              label="Prefer not to say"
+              setCustomGender={setCustomGender}
+              customGender={customGender}
+              setChange={setChange}
+              changed={changed}
+            />
+          </div>
+          <button
+            className={styles.gender_save_btn}
+            onClick={() => setGenderModal(false)}
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function FormControlBox({
   id,
@@ -29,14 +183,6 @@ function FormControlBox({
   change,
   setChange,
 }) {
-  console.log("Incoming Form Data", {
-    id,
-    label,
-    placeholder,
-    type,
-    value,
-    setValue,
-  });
   return (
     <div className={styles.form_control_box}>
       <aside>
@@ -64,7 +210,12 @@ function FormControlBox({
             <textarea
               id={id}
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(e) => {
+                if (!change) {
+                  setChange(true);
+                }
+                setValue(e.target.value);
+              }}
               autoComplete="off"
             />
           )}
@@ -93,13 +244,18 @@ function index() {
   const [bio, setBio] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
-  const [gender, setGender] = React.useState("");
-  const [similar, setSimilar] = React.useState("");
+  const [gender, setGender] = React.useState(0);
+  const [similar, setSimilar] = React.useState(false);
   const [changed, setChange] = React.useState(false);
   const [file, setFile] = React.useState(null);
   const [image, setImage] = React.useState(null);
   const [avatar, setAvatar] = React.useState(null);
+  const [gender_modal, setGenderModal] = React.useState(false);
   const router = useRouter();
+  const [saved, setSaved] = React.useState(false);
+  const [customGender, setCustomGender] = React.useState("");
+  const [active_tab, setTab] = React.useState(0);
+
   const user = useAuth();
   console.log("User Updated", user);
   React.useEffect(() => {
@@ -109,13 +265,14 @@ function index() {
         console.log("User Data", u);
         setUserData(u);
         setPersonName(u.name);
-        setUname(u.username);
-        setWebsite(u.website);
+        setUname(u.username ? u.username : "");
+        setWebsite(u.website ? u.website : "");
         setEmail(u.email);
-        setPhone(u.phone);
-        setBio(u.bio);
-        setGender(u.gender);
+        setPhone(u.phone ? u.phone : "");
+        setBio(u.bio ? u.bio : "");
+        setGender(u.gender ? u.gender : 0);
         setAvatar(u.avatar);
+        setSimilar(u.similar ? u.similar : false);
       });
     }
   }, [user]);
@@ -192,8 +349,11 @@ function index() {
               bio: bio,
               email: email,
               phone: phone,
+              gender: gender === 2 ? customGender : gender,
+              similar: similar,
             }).then((done) => {
-              console.log(done);
+              setChange(false);
+              setSaved({ message: "Successfully Profile Updated" });
             });
           });
         }
@@ -207,11 +367,19 @@ function index() {
         bio: bio,
         email: email,
         phone: phone,
+        gender: gender === 2 ? customGender : gender,
+        similar: similar,
       }).then((done) => {
-        console.log(done);
+        if (done) {
+          setChange(false);
+          setSaved({ message: "Successfully Profile Updated" });
+        }
       });
     }
   };
+
+  console.log(gender === 2 && customGender);
+  let genders = ["Male", "Female", customGender, "Not Prefer To Say"];
 
   return (
     <div>
@@ -227,7 +395,9 @@ function index() {
             <div className={styles.edit_options}>
               <ul className={styles.settings_container}>
                 <li>
-                  <a href="#">Edit Profile</a>
+                  <a href="#" className={active_tab === 0 && styles.active_tab}>
+                    Edit Profile
+                  </a>
                 </li>
                 <li>
                   <a href="#">Professional Account</a>
@@ -387,8 +557,11 @@ function index() {
                       <label htmlFor="gender">Gender</label>
                     </aside>
                     <div className={styles.choice_controller}>
-                      <div className={styles.choice_selector}>
-                        <p>Male</p>
+                      <div
+                        className={styles.choice_selector}
+                        onClick={() => setGenderModal(true)}
+                      >
+                        <p>{genders[gender]}</p>
                       </div>
                     </div>
                   </div>
@@ -402,7 +575,16 @@ function index() {
 
                     <div className={styles.choice_controller}>
                       <div className="checked_input">
-                        <input type="checkbox" name="similar" id="similar" />
+                        <input
+                          type="checkbox"
+                          name="similar"
+                          id="similar"
+                          onChange={(e) => {
+                            setChange(true);
+                            setSimilar(!similar);
+                          }}
+                          checked={similar}
+                        />
                         <p>
                           Include your account when recommending similar
                           accounts that people might want to follow
@@ -424,6 +606,21 @@ function index() {
             </div>
           </div>
         </div>
+      )}
+      {gender_modal && (
+        <GenderSelector
+          setGender={setGender}
+          gender={gender}
+          setGenderModal={setGenderModal}
+          setCustomGender={setCustomGender}
+          customGender={customGender}
+          setChange={setChange}
+          changed={changed}
+        />
+      )}
+
+      {saved && (
+        <SnackBar saved={saved} setSaved={setSaved} setChange={setChange} />
       )}
     </div>
   );

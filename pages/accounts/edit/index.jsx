@@ -405,11 +405,14 @@ function index() {
           };
         });
         console.log("Contacts", contacts);
-        setContacts(contacts);
+
         saveContacts(user_data.uid, contacts)
           .then((done) => {
             if (done) {
-              setSaved({ message: "Successfully Contacts Updated" });
+              setSaved({
+                message: "Successfully Contacts Loaded! Reload the Page",
+              });
+              setContacts(contacts);
             }
           })
           .catch((e) => {
@@ -426,6 +429,7 @@ function index() {
     const { accessToken } = response;
     getContacts(accessToken);
   };
+  console.log(contacts);
 
   return (
     <div>
@@ -765,7 +769,7 @@ function index() {
                       />
                     )}
 
-                    {user_data && contacts && contacts.length > 0 && (
+                    {user_data && contacts.length > 0 && (
                       <div className={`${styles.contacts_wrapper} mt-5`}>
                         <div className={`${styles.contact_wrapper_header}`}>
                           <h3>{user_data.contacts.length} synced contacts</h3>

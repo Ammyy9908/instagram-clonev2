@@ -258,7 +258,7 @@ function index() {
   const router = useRouter();
   const [saved, setSaved] = React.useState(false);
   const [customGender, setCustomGender] = React.useState("");
-  const [active_tab, setTab] = React.useState(6);
+  const [active_tab, setTab] = React.useState(1);
   const [contacts, setContacts] = React.useState([]);
 
   const user = useAuth();

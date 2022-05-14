@@ -52,9 +52,10 @@
 .black_post_image_box{
     height:614px;
     width: 100%;
-    background-color: rgb(106, 105, 105);
+    background-color: rgb(226, 226, 226);
     position:relative;
     overflow: hidden;
+    border: 1px solid #dbdbdb;
 }
 .black_post_image_box::before,.blank_user_avatar::before{
     content:"";

@@ -18,7 +18,7 @@ function LogoutModal({ user }) {
             console.log("User Online", done);
           })
           .catch((e) => console.log(e));
-        router.push("/accounts/login");
+        router.push("/accounts/auth/login");
       })
       .catch((e) => {
         console.log(e);

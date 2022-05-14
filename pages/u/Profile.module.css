@@ -46,6 +46,95 @@ gap:15px;
     background-color: #eee;
     border-radius: 50%;
 }
+
+.profile_user_avatar_blank{
+    width:175px;
+    height:175px;
+    background-color: #eee;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+}
+.profile_user_avatar_blank::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:50%;
+    height:100%;
+    background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.9),
+          transparent
+        );
+    
+    
+    animation:loading .6s infinite;
+}
+
+.user_info_item_blank{
+    display: inline-block;
+    width: 110px;
+    height: 15px;
+    background-color: rgb(20, 20, 20);
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+}
+.blank_edit_btn{
+    width: 110px;
+    height: 25px;
+    background-color: #eee;
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    border: 1px solid #dbdbdb;
+}
+.blank_name{
+    width: 170px;
+    height: 15px;
+    background-color: #eee;
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    border: 1px solid #dbdbdb;
+}
+.blank_setting_btn{
+    width:28px;
+    height:28px;
+    border: 1px solid #dbdbdb;
+    border-radius: 65px;
+    background-color: #eee;
+    position: relative;
+    overflow: hidden;
+}
+.user_info_item_blank::after,.blank_edit_btn::after,.blank_name::after,.blank_setting_btn::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:50%;
+    height:100%;
+    background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.9),
+          transparent
+        );
+    
+    
+    animation:loading .6s infinite;
+}
+
+@keyframes loading{
+    0%{
+        transform:skew(-10deg) translateX(-100%);
+    }
+    100%{
+        transform:skew(-10deg) translateX(200%);
+    }
+}
 .profile_user_avatar img{
     width: 100%;
     height: 100%;

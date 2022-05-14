@@ -25,7 +25,7 @@ function NavButton({ children, handler }) {
   );
 }
 
-function Navbar({ setLogout, user, setNewPost }) {
+function Navbar({ setLogout, user, setNewPost, mounted }) {
   const [dropdown, setDropdown] = React.useState(false);
 
   return (
@@ -49,113 +49,141 @@ function Navbar({ setLogout, user, setNewPost }) {
               </a>
             </Link>
           </div>
-          <div className={`${styles.searchbar} hidden lg:flex`}>
-            <div className={styles.searchbox}>
-              <div className={styles.search}>
-                <img src="/assets/search.svg" alt="" />
-                <input type="text" placeholder="Search" />
+          {mounted && (
+            <div className={`${styles.searchbar} hidden lg:flex`}>
+              <div className={styles.searchbox}>
+                <div className={styles.search}>
+                  <img src="/assets/search.svg" alt="" />
+                  <input type="text" placeholder="Search" />
+                </div>
               </div>
             </div>
-          </div>
-          <div className={styles.navbar_buttons}>
-            <NavLink link="/">
-              <img src="/assets/home.svg" alt="" />
-            </NavLink>
-            <NavLink link="/direct">
-              <img src="/assets/messenger.svg" alt="" />
-            </NavLink>
-            <NavButton
-              handler={() => {
-                setNewPost(true);
-              }}
-            >
-              <img src="/assets/new.svg" alt="" />
-            </NavButton>
-            <NavLink link="/explore">
-              <img src="/assets/explore.svg" alt="" />
-            </NavLink>
-            <NavButton>
-              <img src="/assets/heart.svg" alt="" />
-            </NavButton>
-            <NavButton>
-              <div
-                className={`${styles.user_avatar} rounded-xl cursor-pointer`}
-                style={{
-                  width: "23px",
-                  height: "23px",
-                  backgroundColor: "#eee",
-                  position: "relative",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                tabIndex="1"
-                onClick={() => setDropdown(!dropdown)}
-              >
-                {user && user.avatar !== "null" ? (
-                  <img src={user.avatar} alt={user.name} />
-                ) : (
-                  <p className="text-xs">SK</p>
-                )}
-                {dropdown && (
-                  <div className={styles.user_dropdown}>
-                    <ul className={styles.user_dropdown_list}>
-                      <li>
-                        <Link href={`/u/${user && user.uid}`}>
-                          <a>
-                            <span>
-                              <FaRegUserCircle />
-                            </span>
-                            Profile
-                          </a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href={`/u/${user && user.uid}/saved`}>
-                          <a>
-                            <span>
-                              <BsBookmark />
-                            </span>
-                            Saved
-                          </a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/accounts/edit">
-                          <a>
-                            <span>
-                              <GrSettingsOption />
-                            </span>
-                            Settings
-                          </a>
-                        </Link>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <span>
-                            <MdRestartAlt />
-                          </span>
-                          Switch accounts
-                        </a>
-                      </li>
-                    </ul>
+          )}
+          {mounted ? (
+            <div>
+              {user ? (
+                <div className={styles.navbar_buttons}>
+                  <NavLink link="/">
+                    <img src="/assets/home.svg" alt="" />
+                  </NavLink>
+                  <NavLink link="/direct">
+                    <img src="/assets/messenger.svg" alt="" />
+                  </NavLink>
+                  <NavButton
+                    handler={() => {
+                      setNewPost(true);
+                    }}
+                  >
+                    <img src="/assets/new.svg" alt="" />
+                  </NavButton>
+                  <NavLink link="/explore">
+                    <img src="/assets/explore.svg" alt="" />
+                  </NavLink>
+                  <NavButton>
+                    <img src="/assets/heart.svg" alt="" />
+                  </NavButton>
+                  <NavButton>
                     <div
-                      className={`${styles.dropdown_footer} flex py-3 py-2 items-center justify-center`}
+                      className={`${styles.user_avatar} rounded-xl cursor-pointer`}
+                      style={{
+                        width: "23px",
+                        height: "23px",
+                        backgroundColor: "#eee",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      tabIndex="1"
+                      onClick={() => setDropdown(!dropdown)}
                     >
-                      <button
-                        onClick={() => {
-                          console.log("clicked");
-                          setLogout(true);
-                        }}
-                      >
-                        Logout
-                      </button>
+                      {user && user.avatar !== "null" ? (
+                        <img src={user.avatar} alt={user.name} />
+                      ) : (
+                        <p className="text-xs">SK</p>
+                      )}
+                      {dropdown && (
+                        <div className={styles.user_dropdown}>
+                          <ul className={styles.user_dropdown_list}>
+                            <li>
+                              <Link href={`/u/${user && user.uid}`}>
+                                <a>
+                                  <span>
+                                    <FaRegUserCircle />
+                                  </span>
+                                  Profile
+                                </a>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href={`/u/${user && user.uid}/saved`}>
+                                <a>
+                                  <span>
+                                    <BsBookmark />
+                                  </span>
+                                  Saved
+                                </a>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/accounts/edit">
+                                <a>
+                                  <span>
+                                    <GrSettingsOption />
+                                  </span>
+                                  Settings
+                                </a>
+                              </Link>
+                            </li>
+                            <li>
+                              <a href="#">
+                                <span>
+                                  <MdRestartAlt />
+                                </span>
+                                Switch accounts
+                              </a>
+                            </li>
+                          </ul>
+                          <div
+                            className={`${styles.dropdown_footer} flex py-3 py-2 items-center justify-center`}
+                          >
+                            <button
+                              onClick={() => {
+                                console.log("clicked");
+                                setLogout(true);
+                              }}
+                            >
+                              Logout
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
-            </NavButton>
-          </div>
+                  </NavButton>
+                </div>
+              ) : (
+                <div className="auth_btn flex gap-2 items-center">
+                  <Link href="/accounts/auth/login">
+                    <a className="py-1 px-2 bg-sky-600 text-white">Login</a>
+                  </Link>
+                  <Link href="/accounts/auth/create">
+                    <a className="py-1 px-2 bg-white text-sky-600 font-bold">
+                      Signup
+                    </a>
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={styles.blank_nav_buttons}>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          )}
         </div>
       </div>
     </div>

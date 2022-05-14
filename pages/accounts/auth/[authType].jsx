@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
 import React from "react";
 import styles from "./Auth.module.css";
-import { firebase, db } from "../../firebaseConfig";
+import { firebase, db } from "../../../firebaseConfig";
+import SnackBar from "../../../components/SnackBar/SnackBar";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
 //eslint-disable-next-line
 
@@ -37,6 +38,20 @@ function Auth() {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
+  const [changed, setChange] = React.useState(false);
+
+  // empty fields when route changes
+
+  React.useEffect(() => {
+    setEmail("");
+    setName("");
+    setUsername("");
+    setPassword("");
+    setError(false);
+    setSaved(false);
+    setChange(false);
+  }, [router.query]);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -73,7 +88,16 @@ function Auth() {
         router.push("/");
       })
       .catch((e) => {
-        console.log(e);
+        console.log(e.message);
+        if (e.message === "Firebase: Error (auth/user-not-found).") {
+          setSaved({
+            message: "No user found with this email",
+          });
+          return;
+        }
+        setSaved({
+          message: "Email or password is incorrect",
+        });
       });
   };
   async function createNewUserData(user) {
@@ -94,6 +118,7 @@ function Auth() {
       updated_at: new Date(),
       status: "online",
       contacts: [],
+      account_type: "personal",
     })
       .then(function (docRef) {
         console.log(docRef);
@@ -178,7 +203,9 @@ function Auth() {
           <p>
             {authType === "create" ? "Already" : `Don't`} have an account?{" "}
             <Link
-              href={`/accounts${authType === "login" ? "/create" : "/login"}`}
+              href={`/accounts/auth${
+                authType === "login" ? "/create" : "/login"
+              }`}
             >
               <a className="text-sky-500">
                 {authType === "login" ? "Sign Up" : "Login"}
@@ -187,6 +214,9 @@ function Auth() {
           </p>
         </div>
       </div>
+      {saved && (
+        <SnackBar saved={saved} setSaved={setSaved} setChange={setChange} />
+      )}
     </div>
   );
 }

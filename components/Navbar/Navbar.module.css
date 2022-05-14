@@ -56,10 +56,44 @@
     outline: 0;
 }
 
-.navbar_buttons{
+.navbar_buttons,.blank_nav_buttons{
     display: flex;
     align-items: center;
     gap:22px;
+}
+.blank_nav_buttons span{
+    display: block;
+    width:23px;
+    height:23px;
+    background-color: #eee;
+    border-radius: 50%;
+    position: relative;
+}
+
+.blank_nav_buttons span::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.9),
+          transparent
+        );
+    
+    
+    animation:loading .6s infinite;
+}
+@keyframes loading{
+    0%{
+        transform:skew(-10deg) translateX(-100%);
+    }
+    100%{
+        transform:skew(-10deg) translateX(200%);
+    }
 }
 .user_avatar:focus{
     border: 1px solid;

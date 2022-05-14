@@ -1,18 +1,28 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import useAuth from "../../hooks/useAuth";
 import styles from "../../styles/Direct.module.css";
+import { BsEmojiWink, BsHeart } from "react-icons/bs";
 import { HiOutlinePencilAlt } from "react-icons/hi";
 import ChatItem from "../../components/ChatItem/ChatItem";
 import InfoIcon from "../../components/Icons/InfoIcon";
+import getMyChats from "../../utils/getMyChats";
+import { FiImage } from "react-icons/fi";
+import getCurrentUserData from "../../utils/getUser";
 function Direct() {
   const [logout, setLogout] = React.useState(false);
   const [newPost, setNewPost] = React.useState(false);
   const [paddingTop] = React.useState(0);
   const [paddingBottom, setPaddingBottom] = React.useState(0);
   const [chat, setChat] = React.useState(false);
+  const [chats, setChats] = React.useState(null);
+  const [mounted, setMounted] = React.useState(false);
+  const [currentChatUser, setCurrentChatUser] = React.useState(false);
+  const [currentChats, setCurrentChats] = React.useState(false);
+  const [user_data, setUserData] = React.useState(null);
   const router = useRouter();
   const user = useAuth();
 
@@ -24,6 +34,33 @@ function Direct() {
       e.target.scrollHeight - e.target.scrollTop * 2 - e.target.clientHeight
     );
   };
+
+  React.useEffect(() => {
+    if (user || user_data) {
+      getCurrentUserData(user.uid).then((u) => {
+        console.log("User Data", u);
+        setUserData(u);
+      });
+    }
+  }, [user]);
+
+  React.useEffect(() => {
+    if (user) {
+      setMounted(true);
+      getMyChats(user.uid).then((messages) => {
+        console.log(messages);
+        setChats(messages);
+      });
+    }
+  }, [user]);
+
+  const handleCurrentChat = (chat, current_user, current_chats) => {
+    setChat(chat);
+    setCurrentChatUser(current_user);
+    setCurrentChats(current_chats);
+    console.log(chat, current_user, current_chats);
+  };
+  console.log("Chat=>", chat);
 
   return (
     <div>
@@ -37,8 +74,9 @@ function Direct() {
       </Head>
       <Navbar
         setLogout={setLogout}
-        user={user && user}
+        user={mounted ? user_data : null}
         setNewPost={setNewPost}
+        mounted={mounted}
       />
 
       <div className={styles.direct__body}>
@@ -50,7 +88,7 @@ function Direct() {
                 <div className={styles.chat_author}>
                   <div className={styles.chat_author_container}>
                     <button>
-                      Sumit Bighaniya
+                      {user_data && user_data.name}
                       <span>
                         <svg
                           aria-label="Down Chevron Icon"
@@ -80,60 +118,16 @@ function Direct() {
                 paddingBottom: paddingBottom,
               }}
             >
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
+              {chats &&
+                chats.map((chat, index) => {
+                  console.log("ind chat", chat);
+                  return (
+                    <ChatItem key={index} chat={chat} uid={user && user.uid} />
+                  );
+                })}
             </div>
           </div>
           <div className={styles.chat_body}>
-            {chat && (
-              <div className={styles.chat_body_header}>
-                <div className={styles.chat_body_header_wrap}>
-                  <div className={styles.chat_body_header_content}>
-                    <div className={styles.chat_header_primary}>
-                      <div className={styles.chat_primary_content}>
-                        <div className={styles.chat_primary_user_avatar}></div>
-                        <div className={styles.current_chat_meta}>
-                          <button>
-                            <div className={styles.current_chat_content}>
-                              <h3 className={styles.chat_user_name}>
-                                Ravi Ranjan Jha
-                              </h3>
-                              <p className="text-sm text-gray-600">
-                                Active now
-                              </p>
-                            </div>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className={styles.chat_header_controls}>
-                      <button>
-                        <InfoIcon />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className={styles.chat_body_empty}>
               <div className={styles.empty_chat_icon}>
                 <svg

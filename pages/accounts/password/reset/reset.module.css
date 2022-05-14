@@ -1,0 +1,38 @@
+.forgot_password_wrapper{
+    width:80%;
+    margin:65px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 75vh;
+}
+.forgot_password_container{
+    width: 450px;
+    border-radius: 3px;
+    border: 1px solid #dbdbdb;
+}
+.forgot_password_box{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+.forgot_password_box p{
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.custom_input{
+    width: 75%;
+    min-height: 40px;
+    background-color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+}
+.custom_input input{
+    width: 95%;
+    background-color: transparent;
+    outline: 0;
+}

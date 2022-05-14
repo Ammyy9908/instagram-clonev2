@@ -2,7 +2,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { firebase } from "../../../firebaseConfig";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import React from "react";
 import Loading from "../../../components/Loading/Loading";
 import Navbar from "../../../components/Navbar/Navbar";
@@ -11,16 +10,16 @@ import getCurrentUserData from "../../../utils/getUser";
 import updateProfile from "../../../utils/updateUserProfile";
 import styles from "./edit.module.css";
 import { GrClose } from "react-icons/gr";
-import GoogleLogin from "react-google-login";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import loadContacts from "../../../utils/loadContacts";
-import saveContacts from "../../../utils/saveContacts";
-import removeContacts from "../../../utils/removeContacts";
+import Link from "next/link";
+import switchProfile from "../../../utils/switchProfessionalAccount";
+import disableAccount from "../../../utils/disbaleAccount";
+import updateUserEmail from "../../../utils/updateUserEmail";
 
 function SnackBar({ saved, setSaved }) {
   React.useEffect(() => {
@@ -255,17 +254,16 @@ function index() {
   const [image, setImage] = React.useState(null);
   const [avatar, setAvatar] = React.useState(null);
   const [gender_modal, setGenderModal] = React.useState(false);
-  const router = useRouter();
   const [saved, setSaved] = React.useState(false);
   const [customGender, setCustomGender] = React.useState("");
-  const [active_tab, setTab] = React.useState(1);
-  const [contacts, setContacts] = React.useState([]);
+  const [disabled, setDisabled] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
 
   const user = useAuth();
-  console.log("User Updated", user);
   React.useEffect(() => {
     if (user || user_data) {
       setLoading(false);
+      setMounted(true);
       getCurrentUserData(user.uid).then((u) => {
         console.log("User Data", u);
         setUserData(u);
@@ -277,8 +275,8 @@ function index() {
         setBio(u.bio ? u.bio : "");
         setGender(u.gender ? u.gender : 0);
         setAvatar(u.avatar);
-        setContacts(u.contacts);
         setSimilar(u.similar ? u.similar : false);
+        setDisabled(u.is_disabled ? u.is_disabled : false);
       });
     }
   }, [user]);
@@ -315,7 +313,7 @@ function index() {
     }
   };
 
-  const uploadProfile = (e) => {
+  const uploadProfile = async (e) => {
     e.preventDefault();
     if (file) {
       const storageRef = ref(
@@ -347,96 +345,116 @@ function index() {
         () => {
           // Handle successful uploads on complete
           // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            updateProfile(user_data.uid, {
-              avatar: downloadURL,
-              name: person_name,
-              username: uname,
-              website: website,
-              bio: bio,
-              email: email,
-              phone: phone,
-              gender: gender === 2 ? customGender : gender,
-              similar: similar,
-            }).then((done) => {
-              setChange(false);
-              setSaved({ message: "Successfully Profile Updated" });
-            });
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            try {
+              const email_updated = await updateUserEmail(user, email);
+              console.log(email_updated);
+              if (email_updated) {
+                updateProfile(user_data.uid, {
+                  avatar: downloadURL,
+                  name: person_name,
+                  username: uname,
+                  website: website,
+                  bio: bio,
+                  email: email,
+                  phone: phone,
+                  gender: gender === 2 ? customGender : gender,
+                  similar: similar,
+                }).then((done) => {
+                  setChange(false);
+                  setSaved({ message: "Successfully Profile Updated" });
+                });
+              }
+            } catch (e) {
+              console.log(e);
+            }
           });
         }
       );
     } else {
-      updateProfile(user_data.uid, {
-        avatar: avatar,
-        name: person_name,
-        username: uname,
-        website: website,
-        bio: bio,
-        email: email,
-        phone: phone,
-        gender: gender === 2 ? customGender : gender,
-        similar: similar,
-      }).then((done) => {
-        if (done) {
-          setChange(false);
-          setSaved({ message: "Successfully Profile Updated" });
+      try {
+        const email_updated = await updateUserEmail(user, email);
+        console.log(email_updated);
+        if (email_updated) {
+          updateProfile(user_data.uid, {
+            avatar: avatar,
+            name: person_name,
+            username: uname,
+            website: website,
+            bio: bio,
+            email: email,
+            phone: phone,
+            gender: gender === 2 ? customGender : gender,
+            similar: similar,
+          }).then((done) => {
+            setChange(false);
+            setSaved({ message: "Successfully Profile Updated" });
+          });
         }
-      });
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
   console.log(gender === 2 && customGender);
   let genders = ["Male", "Female", customGender, "Not Prefer To Say"];
 
-  const getContacts = (token) => {
-    loadContacts(token)
-      .then((r) => {
-        console.log(r);
-        const { connections } = r;
-        if (!connections) {
-          return setSaved({
-            message: "No Contacts Found! Choose different google account",
-          });
+  const handleAccountSwitch = () => {
+    switchProfile(
+      user && user.uid,
+      user_data.account_type === "professional" ? "personal" : "professional"
+    )
+      .then((done) => {
+        if (done) {
+          window.location.reload();
         }
-        const contacts = connections.map((connection) => {
-          return {
-            phone: connection.phoneNumbers[0].value,
-            uname: connection.names[0].displayName,
-          };
-        });
-        console.log("Contacts", contacts);
-
-        saveContacts(user_data.uid, contacts)
-          .then((done) => {
-            if (done) {
-              setSaved({
-                message: "Successfully Contacts Loaded! Reload the Page",
-              });
-              setContacts(contacts);
-            }
-          })
-          .catch((e) => {
-            console.log(e);
-          });
       })
       .catch((e) => {
         console.log(e);
       });
   };
 
-  const responseGoogle = (response) => {
-    console.log(response);
-    const { accessToken } = response;
-    getContacts(accessToken);
+  const handleDisbaleAccount = async () => {
+    const done = await disableAccount(user && user.uid, true);
+    console.log("Done", done);
+    if (done) {
+      setSaved({
+        message: "Account Disabled",
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } else {
+      setSaved({
+        message: "Error in Disabling Account",
+      });
+    }
   };
-  console.log(contacts);
+
+  const handleEnableAccount = async () => {
+    const done = await disableAccount(user && user.uid, false);
+    console.log("Done", done);
+    if (done) {
+      setSaved({
+        message: "Account Enabled",
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } else {
+      setSaved({
+        message: "Error in Enabling Account",
+      });
+    }
+  };
 
   return (
     <div>
       <Head>
         <title>NextInsta | Edit Profile</title>
       </Head>
-      <Navbar />
+      {mounted && <Navbar user={user_data && user_data} mounted={mounted} />}
       {loading && <Loading />}
 
       {user_data && (
@@ -445,108 +463,66 @@ function index() {
             <div className={styles.edit_options}>
               <ul className={styles.settings_container}>
                 <li>
-                  <button
-                    className={active_tab === 1 && styles.active_tab}
-                    onClick={() => {
-                      setTab(1);
-                    }}
-                  >
-                    Edit Profile
-                  </button>
+                  <Link href="/accounts/edit">
+                    <a className={styles.active_tab}>Edit Profile</a>
+                  </Link>
+                </li>
+                {user_data.account_type === "professional" && (
+                  <li>
+                    <Link href="/accounts/professional_account_settings">
+                      <a>Professional Account</a>
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <Link href="/accounts/password/change">
+                    <a>Change Password</a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    className={active_tab === 2 && styles.active_tab}
-                    onClick={() => {
-                      setTab(2);
-                    }}
-                  >
-                    Professional Account
-                  </button>
+                  <Link href="/emails/settings">
+                    <a>Email notifications</a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    className={active_tab === 3 && styles.active_tab}
-                    onClick={() => {
-                      setTab(3);
-                    }}
-                  >
-                    Change Password
-                  </button>
+                  <Link href="/push/web/settings">
+                    <a>Push notifications</a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    className={active_tab === 4 && styles.active_tab}
-                    onClick={() => {
-                      setTab(4);
-                    }}
-                  >
-                    Email notifications
-                  </button>
+                  <Link href="/accounts/contact_history">
+                    <a>Manage contacts</a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    className={active_tab === 5 && styles.active_tab}
-                    onClick={() => {
-                      setTab(5);
-                    }}
-                  >
-                    Push notifications
-                  </button>
+                  <Link href="/accounts/privacy_and_security">
+                    <a>Privacy and Security</a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    className={active_tab === 6 && styles.active_tab}
-                    onClick={() => {
-                      setTab(6);
-                    }}
-                  >
-                    Manage contacts
-                  </button>
+                  <Link href="/sessions/login/activity">
+                    <a>Login activity</a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    className={active_tab === 7 && styles.active_tab}
-                    onClick={() => {
-                      setTab(7);
-                    }}
-                  >
-                    Privacy and Security
-                  </button>
+                  <Link href="/emails/email_sent">
+                    <a>Email from NextInsta</a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    className={active_tab === 8 && styles.active_tab}
-                    onClick={() => {
-                      setTab(8);
-                    }}
-                  >
-                    Login activity
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={active_tab === 9 && styles.active_tab}
-                    onClick={() => {
-                      setTab(9);
-                    }}
-                  >
-                    Email from NextInsta
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={active_tab === 10 && styles.active_tab}
-                    onClick={() => {
-                      setTab(10);
-                    }}
-                  >
-                    Help
-                  </button>
+                  <Link href="/settings/help">
+                    <a>Help</a>
+                  </Link>
                 </li>
                 <div className={styles.professional_account_switcher}>
                   <div className={styles.professional_account_switcher_content}>
-                    <button>Swicth to Professional Account</button>
+                    <button onClick={handleAccountSwitch}>
+                      Switch to{" "}
+                      {user_data.account_type === "professional"
+                        ? "Personal"
+                        : "Professional"}{" "}
+                      Account
+                    </button>
                   </div>
                 </div>
                 <div className={styles.account_center_block}>
@@ -570,246 +546,166 @@ function index() {
               </ul>
             </div>
             <div className={styles.setting_body}>
-              {active_tab === 1 && (
-                <div className={styles.profile_setting_body}>
-                  <div className={styles.profile_setting_header}>
-                    <div
-                      className={styles.profile_setting_header_avatar_wrapper}
-                    >
-                      <div className={styles.profile_header_avatar}>
-                        <button>
-                          {user_data && (
-                            <img
-                              src={image ? image : user_data.avatar}
-                              alt=""
-                            />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    <div className={styles.profile_user_information}>
-                      <h1 className={styles.profile_seeting_user_name}>
-                        sumitbighaniya
-                      </h1>
-
-                      <label
-                        htmlFor="file"
-                        className={styles.profile_change_btn}
-                      >
-                        <input
-                          type="file"
-                          name="file"
-                          id="file"
-                          onChange={handleFile}
-                        />
-                        <span>Change Profile Photo</span>
-                      </label>
-                    </div>
-                  </div>
-                  <form
-                    action=""
-                    className={styles.user_profile_edit_form}
-                    onSubmit={uploadProfile}
-                  >
-                    <FormControlBox
-                      id="person_name"
-                      placeholder="Person Name"
-                      value={person_name}
-                      setValue={setPersonName}
-                      form_type="single"
-                      type="text"
-                      label="Name"
-                      disabled={true}
-                      setChange={setChange}
-                      change={changed}
-                    />
-                    <FormControlBox
-                      id="uname"
-                      placeholder="Username"
-                      value={uname}
-                      setValue={setUname}
-                      form_type="single"
-                      type="text"
-                      label="Username"
-                      setChange={setChange}
-                      change={changed}
-                    />
-                    <FormControlBox
-                      id="website"
-                      placeholder="Website"
-                      value={website}
-                      setValue={setWebsite}
-                      form_type="single"
-                      type="text"
-                      label="Website"
-                      setChange={setChange}
-                      change={changed}
-                    />
-                    <FormControlBox
-                      id="bio"
-                      placeholder="Bio"
-                      value={bio}
-                      setValue={setBio}
-                      form_type="multi"
-                      type="text"
-                      label="Bio"
-                      setChange={setChange}
-                      change={changed}
-                    />
-                    <FormControlBox
-                      id="email"
-                      placeholder="Email address"
-                      value={email}
-                      setValue={setEmail}
-                      form_type="single"
-                      type="email"
-                      label="Email address"
-                      setChange={setChange}
-                      change={changed}
-                    />
-                    <FormControlBox
-                      id="phone"
-                      placeholder="Phone number"
-                      value={phone}
-                      setValue={setPhone}
-                      form_type="single"
-                      type="text"
-                      label="Phone number"
-                      setChange={setChange}
-                      change={changed}
-                    />
-
-                    <div className={styles.form_choice_controller}>
-                      <aside>
-                        <label htmlFor="gender">Gender</label>
-                      </aside>
-                      <div className={styles.choice_controller}>
-                        <div
-                          className={styles.choice_selector}
-                          onClick={() => setGenderModal(true)}
-                        >
-                          <p>{genders[gender]}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={styles.form_choice_controller}>
-                      <aside>
-                        <label htmlFor="similar">
-                          Similar account suggestions
-                        </label>
-                      </aside>
-
-                      <div className={styles.choice_controller}>
-                        <div className="checked_input">
-                          <input
-                            type="checkbox"
-                            name="similar"
-                            id="similar"
-                            onChange={(e) => {
-                              setChange(true);
-                              setSimilar(!similar);
-                            }}
-                            checked={similar}
-                          />
-                          <p>
-                            Include your account when recommending similar
-                            accounts that people might want to follow
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={styles.form_submit_controller}>
-                      <input
-                        type="submit"
-                        value="Submit"
-                        className={!changed ? styles.disabled : null}
-                      />
-                      <button>Temporarily disable my account</button>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {active_tab === 6 && (
-                <div className={styles.profile_contact_body}>
-                  <div className={styles.profile_contact_wrapper}>
-                    <h2>Manage Contacts</h2>
-                    <p className="mt-3">
-                      The people listed here are contacts that you`ve uploaded
-                      to NextInsta. To remove your synced contacts, tap Delete
-                      All. Your contacts will be re-uploaded the next time
-                      Instagram syncs your contacts unless you go to your device
-                      settings and turn off access to contacts.
-                    </p>
-                    <p className="mt-5">
-                      Only you can see your contacts, but Instagram uses the
-                      information you`ve uploaded about your contacts to make
-                      friend suggestions for you and others and to provide a
-                      better experience for everyone.
-                    </p>
-
-                    {contacts && contacts.length <= 0 && (
-                      <GoogleLogin
-                        clientId="854383202900-nmfjq1rahjr83kh138am84fucmiuj694.apps.googleusercontent.com"
-                        render={(renderProps) => (
-                          <button
-                            onClick={renderProps.onClick}
-                            disabled={renderProps.disabled}
-                            className={styles.google_contact_load_btn}
-                          >
-                            Load Contacts
-                          </button>
+              <div className={styles.profile_setting_body}>
+                <div className={styles.profile_setting_header}>
+                  <div className={styles.profile_setting_header_avatar_wrapper}>
+                    <div className={styles.profile_header_avatar}>
+                      <button>
+                        {user_data && (
+                          <img src={image ? image : user_data.avatar} alt="" />
                         )}
-                        buttonText="Login"
-                        onSuccess={responseGoogle}
-                        onFailure={responseGoogle}
-                        scope="https://www.googleapis.com/auth/contacts.readonly"
-                      />
-                    )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className={styles.profile_user_information}>
+                    <h1 className={styles.profile_seeting_user_name}>
+                      {user_data.username}
+                    </h1>
 
-                    {user_data && contacts.length > 0 && (
-                      <div className={`${styles.contacts_wrapper} mt-5`}>
-                        <div className={`${styles.contact_wrapper_header}`}>
-                          <h3>{user_data.contacts.length} synced contacts</h3>
-                          <button
-                            onClick={() => {
-                              removeContacts(user_data.uid)
-                                .then((done) => {
-                                  if (done) {
-                                    setSaved({
-                                      message:
-                                        "Successfully removed all contacts",
-                                    });
-                                    setContacts([]);
-                                  }
-                                })
-                                .catch((e) => {
-                                  setSaved({
-                                    message: "Something went wrong",
-                                  });
-                                });
-                            }}
-                          >
-                            Delete all
-                          </button>
-                        </div>
-                        <div className={styles.contact_list}>
-                          {user_data.contacts.map((contact, i) => {
-                            return (
-                              <div className={styles.contact} key={i}>
-                                <h3>{contact.uname}</h3>
-                                <p>{contact.phone}</p>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
+                    <label htmlFor="file" className={styles.profile_change_btn}>
+                      <input
+                        type="file"
+                        name="file"
+                        id="file"
+                        onChange={handleFile}
+                      />
+                      <span>Change Profile Photo</span>
+                    </label>
                   </div>
                 </div>
-              )}
+                <form
+                  action=""
+                  className={styles.user_profile_edit_form}
+                  onSubmit={uploadProfile}
+                >
+                  <FormControlBox
+                    id="person_name"
+                    placeholder="Person Name"
+                    value={person_name}
+                    setValue={setPersonName}
+                    form_type="single"
+                    type="text"
+                    label="Name"
+                    disabled={true}
+                    setChange={setChange}
+                    change={changed}
+                  />
+                  <FormControlBox
+                    id="uname"
+                    placeholder="Username"
+                    value={uname}
+                    setValue={setUname}
+                    form_type="single"
+                    type="text"
+                    label="Username"
+                    setChange={setChange}
+                    change={changed}
+                  />
+                  <FormControlBox
+                    id="website"
+                    placeholder="Website"
+                    value={website}
+                    setValue={setWebsite}
+                    form_type="single"
+                    type="text"
+                    label="Website"
+                    setChange={setChange}
+                    change={changed}
+                  />
+                  <FormControlBox
+                    id="bio"
+                    placeholder="Bio"
+                    value={bio}
+                    setValue={setBio}
+                    form_type="multi"
+                    type="text"
+                    label="Bio"
+                    setChange={setChange}
+                    change={changed}
+                  />
+                  <FormControlBox
+                    id="email"
+                    placeholder="Email address"
+                    value={email}
+                    setValue={setEmail}
+                    form_type="single"
+                    type="email"
+                    label="Email address"
+                    setChange={setChange}
+                    change={changed}
+                  />
+                  <FormControlBox
+                    id="phone"
+                    placeholder="Phone number"
+                    value={phone}
+                    setValue={setPhone}
+                    form_type="single"
+                    type="text"
+                    label="Phone number"
+                    setChange={setChange}
+                    change={changed}
+                  />
+
+                  <div className={styles.form_choice_controller}>
+                    <aside>
+                      <label htmlFor="gender">Gender</label>
+                    </aside>
+                    <div className={styles.choice_controller}>
+                      <div
+                        className={styles.choice_selector}
+                        onClick={() => setGenderModal(true)}
+                      >
+                        <p>{genders[gender]}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.form_choice_controller}>
+                    <aside>
+                      <label htmlFor="similar">
+                        Similar account suggestions
+                      </label>
+                    </aside>
+
+                    <div className={styles.choice_controller}>
+                      <div className="checked_input">
+                        <input
+                          type="checkbox"
+                          name="similar"
+                          id="similar"
+                          onChange={(e) => {
+                            setChange(true);
+                            setSimilar(!similar);
+                          }}
+                          checked={similar}
+                        />
+                        <p>
+                          Include your account when recommending similar
+                          accounts that people might want to follow
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.form_submit_controller}>
+                    <input
+                      type="submit"
+                      value="Submit"
+                      className={!changed ? styles.disabled : null}
+                    />
+                  </div>
+                </form>
+                <button
+                  onClick={
+                    !disabled ? handleDisbaleAccount : handleEnableAccount
+                  }
+                  className={styles.acount_disabled_account}
+                >
+                  {!disabled
+                    ? "Temporarily disable my account"
+                    : "Enable my account"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

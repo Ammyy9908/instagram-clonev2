@@ -13,6 +13,14 @@ body {
  display: none;
 }
 
+.heart_reaction svg{
+  fill: "red";
+}
+
+.emoji_picker_enable{
+  display: block !important;
+}
+
 .animated{
   animation:roll .6s ease-in-out infinite;
   }

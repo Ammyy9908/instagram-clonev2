@@ -8,23 +8,26 @@ import {
 } from "firebase/firestore";
 import React from "react";
 const db = getFirestore();
-function useChats(photo_id) {
-  const [chats, setChats] = React.useState([]);
+function useLive(person_id) {
+  const [activities, setActivities] = React.useState([]);
   React.useEffect(() => {
-    const q = query(collection(db, "messages"));
+    const q = query(
+      collection(db, "onlineactivities"),
+      where("id", "==", person_id)
+    );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const cts = [];
+      const act = [];
       querySnapshot.forEach((doc) => {
-        cts.push(doc.data());
+        act.push(doc.data());
       });
-      setChats(cts);
+      setActivities(act);
     });
 
     return () => unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  return chats;
+  return activities;
 }
 
-export default useChats;
+export default useLive;

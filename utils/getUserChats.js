@@ -9,6 +9,7 @@ import {
 
 const db = getFirestore();
 const getUserChats = async (uid, friend_id) => {
+  console.log(uid, friend_id);
   const from_chats = query(
     collection(db, "messages"),
     where("from", "==", uid),

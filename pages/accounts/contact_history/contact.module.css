@@ -495,12 +495,6 @@ cursor: pointer;
 .contact h3{
     font-weight: 600;
 }
-
-.acount_disabled_account{
-    margin-left: 91px;
-    color: #0095f6;
-    font-weight: 600;
-}
 @media screen and (min-width:768px){
     .profile_setting_header_avatar_wrapper{
         margin: 2px 32px 0 124px;

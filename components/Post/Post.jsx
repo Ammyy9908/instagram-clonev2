@@ -15,6 +15,7 @@ import addComment from "../../utils/addComment";
 import useComments from "../../hooks/useComments";
 import getComment from "../../utils/getComment";
 import useLikes from "../../hooks/useLikes";
+import useSaved from "../../hooks/useSaved";
 TimeAgo.addDefaultLocale(en);
 
 function Post({ image, time, lat, long, uid, id, u }) {
@@ -32,7 +33,8 @@ function Post({ image, time, lat, long, uid, id, u }) {
   const cmts = useComments(id);
 
   const { likes, index } = useLikes(id, u.uid);
-  console.log(index, likes);
+  const saved = useSaved(id, u && u.uid);
+  console.log("saved", saved);
   React.useEffect(() => {
     getLocation(lat, long)
       .then((data) => {
@@ -46,11 +48,16 @@ function Post({ image, time, lat, long, uid, id, u }) {
     } else {
       setPostLiked(false);
     }
+    if (saved) {
+      setBookmarked(true);
+    } else {
+      setBookmarked(false);
+    }
 
     // get user of the post
     getCurrentUserData(uid)
       .then((user) => {
-        setUser(user);
+        setUser(u);
       })
       .catch((e) => console.log(e));
 
@@ -62,9 +69,8 @@ function Post({ image, time, lat, long, uid, id, u }) {
 
     // detect already bookmarked
 
-    isSaved();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid, cmts, likes, index]);
+  }, [uid, cmts, likes, index, saved]);
 
   const handlePostSave = () => {
     savePost(user, id)
@@ -86,12 +92,6 @@ function Post({ image, time, lat, long, uid, id, u }) {
       });
   };
 
-  const isSaved = () => {
-    if (user && user.saved_posts.includes(id)) {
-      setBookmarked(true);
-    }
-  };
-
   const handleComment = () => {
     addComment(comment, u.uid, id)
       .then((res) => {
@@ -103,6 +103,8 @@ function Post({ image, time, lat, long, uid, id, u }) {
         console.log(e);
       });
   };
+
+  console.log(bookmarked);
 
   return (
     <div className={styles.post}>
@@ -199,7 +201,7 @@ function Post({ image, time, lat, long, uid, id, u }) {
             </ul>
           </div>
           <button onClick={() => handlePostSave()}>
-            {bookmarked ? (
+            {!bookmarked ? (
               <img src="/assets/Save.svg" alt="" />
             ) : (
               <FaBookmark />

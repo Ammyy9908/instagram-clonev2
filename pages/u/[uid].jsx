@@ -22,9 +22,12 @@ const auth = getAuth();
 const db = getFirestore();
 import { firebase } from "../../firebaseConfig";
 import Link from "next/link";
+import useComments from "../../hooks/useComments";
+import Progress from "../../components/Progress/Progress";
 
 function ProfilePost({ image, type, photoId }) {
   const [post, setPost] = React.useState(null);
+
   React.useEffect(() => {
     getPost(photoId)
       .then((post) => {
@@ -73,12 +76,13 @@ function UserProfilePost({ image, type }) {
   );
 }
 function User() {
-  const [user_posts, setUserPosts] = React.useState([]);
+  const [user_posts, setUserPosts] = React.useState(null);
   const [User, setUser] = React.useState(false);
   const router = useRouter();
   const { uid } = router.query;
   const [tab, setTab] = React.useState(0);
   const [fdata, setFdata] = React.useState([]);
+  const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     const q = query(collection(db, "followers"));
@@ -92,6 +96,7 @@ function User() {
       .then((user) => {
         console.log("User Profile", user);
         setUser(user);
+        setMounted(true);
       })
       .catch((e) => console.log(e));
 
@@ -139,10 +144,11 @@ function User() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar user={User} />
+      {!mounted && <Progress />}
+      <Navbar user={User} mounted={mounted} />
       <div className={styles.profile_body}>
         <div className={styles.porfile_header}>
-          {User && (
+          {User ? (
             <div className={styles.profile_user_avatar}>
               <img
                 src={
@@ -153,38 +159,68 @@ function User() {
                 alt="some-text"
               />
             </div>
+          ) : (
+            <div className={styles.profile_user_avatar_blank}></div>
           )}
           <div className={styles.profile_user_info}>
             <div className={styles.user_profile_first}>
-              <h3>{User && User.username}</h3>
-              <Link href="/accounts/edit">
-                <a>
-                  <button className={`${styles.edit_btn} text-sm`}>
-                    Edit Profile
-                  </button>
-                </a>
-              </Link>
-              <button className={styles.setting_btn}>
-                <RiSettingsLine />
-              </button>
+              {mounted ? (
+                <h3>{User && User.username}</h3>
+              ) : (
+                <div className={styles.blank_name}></div>
+              )}
+              {mounted ? (
+                <Link href="/accounts/edit">
+                  <a>
+                    <button className={`${styles.edit_btn} text-sm`}>
+                      Edit Profile
+                    </button>
+                  </a>
+                </Link>
+              ) : (
+                <div className={styles.blank_edit_btn}></div>
+              )}
+              {mounted ? (
+                <button className={styles.setting_btn}>
+                  <RiSettingsLine />
+                </button>
+              ) : (
+                <button className={styles.blank_setting_btn}></button>
+              )}
             </div>
             <div className={styles.user_profile_second}>
-              <span className={styles.user_info_item}>
-                <strong>16</strong>
-                <p>posts</p>
-              </span>
-              <span className={styles.user_info_item}>
-                <strong>{getFollowCount()}</strong>
-                <p>followers</p>
-              </span>
-              <span className={styles.user_info_item}>
-                <strong>{getFollowingCount()}</strong>
-                <p>following</p>
-              </span>
+              {user_posts ? (
+                <span className={styles.user_info_item}>
+                  <strong>16</strong>
+                  <p>posts</p>
+                </span>
+              ) : (
+                <span className={styles.user_info_item_blank}></span>
+              )}
+              {fdata.length > 0 ? (
+                <span className={styles.user_info_item}>
+                  <strong>{getFollowCount()}</strong>
+                  <p>followers</p>
+                </span>
+              ) : (
+                <span className={styles.user_info_item_blank}></span>
+              )}
+              {fdata.length > 0 ? (
+                <span className={styles.user_info_item}>
+                  <strong>{getFollowingCount()}</strong>
+                  <p>following</p>
+                </span>
+              ) : (
+                <span className={styles.user_info_item_blank}></span>
+              )}
             </div>
             <div className="user-profile-third">
-              <h3 className="font-semibold">{User && User.name}</h3>
-              <span className="text-gray-600">Education</span>
+              {mounted ? (
+                <h3 className="font-semibold">{User && User.name}</h3>
+              ) : (
+                <div className={styles.blank_name}></div>
+              )}
+              {/* <span className="text-gray-600">Education</span> */}
               {User && <p>{User.bio}</p>}
               <a href="#" className="text-sky-600">
                 {User && User.website}
@@ -192,47 +228,50 @@ function User() {
             </div>
           </div>
         </div>
-        <div className={styles.profile_toggle}>
-          <div className={styles.toggle_body}>
-            <div
-              className={`${styles.toggle_item} ${
-                tab === 0 && styles.toogle_item_enable
-              } cursor-pointer`}
-              onClick={() => setTab(0)}
-            >
-              <span>
-                <img src="/assets/grid.svg" alt="" />
-              </span>
-              <span>POSTS</span>
-            </div>
-            <div
-              className={`${styles.toggle_item} cursor-pointer ${
-                tab === 1 && styles.toogle_item_enable
-              }`}
-              onClick={() => {
-                setTab(1);
-              }}
-            >
-              <span>
-                <img src="/assets/save_icon.svg" alt="" />
-              </span>
-              <span>SAVED</span>
-            </div>
-            <div
-              className={`${styles.toggle_item} ${
-                tab === 2 && styles.toogle_item_enable
-              } cursor-pointer`}
-              onClick={() => setTab(2)}
-            >
-              <span>
-                <img src="/assets/tag.svg" alt="" />
-              </span>
-              <span>TAGGED</span>
+        {user_posts && user_posts.length > 0 && (
+          <div className={styles.profile_toggle}>
+            <div className={styles.toggle_body}>
+              <div
+                className={`${styles.toggle_item} ${
+                  tab === 0 && styles.toogle_item_enable
+                } cursor-pointer`}
+                onClick={() => setTab(0)}
+              >
+                <span>
+                  <img src="/assets/grid.svg" alt="" />
+                </span>
+                <span>POSTS</span>
+              </div>
+              <div
+                className={`${styles.toggle_item} cursor-pointer ${
+                  tab === 1 && styles.toogle_item_enable
+                }`}
+                onClick={() => {
+                  setTab(1);
+                }}
+              >
+                <span>
+                  <img src="/assets/save_icon.svg" alt="" />
+                </span>
+                <span>SAVED</span>
+              </div>
+              <div
+                className={`${styles.toggle_item} ${
+                  tab === 2 && styles.toogle_item_enable
+                } cursor-pointer`}
+                onClick={() => setTab(2)}
+              >
+                <span>
+                  <img src="/assets/tag.svg" alt="" />
+                </span>
+                <span>TAGGED</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         <div className={styles.profile_posts}>
           {tab === 0 &&
+            user_posts &&
             user_posts.length > 0 &&
             user_posts.map((post, i) => {
               return (
@@ -250,10 +289,9 @@ function User() {
             })}
 
           {tab === 2 &&
-            tagged_posts.map((post, i) => {
-              return (
-                <ProfilePost key={i} image={post.thumb} type={post.type} />
-              );
+            User &&
+            User.saved_posts.map((post, i) => {
+              return <ProfilePost key={i} photoId={post} type={"video"} />;
             })}
         </div>
       </div>

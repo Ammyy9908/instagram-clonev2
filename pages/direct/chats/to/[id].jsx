@@ -32,6 +32,13 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
+import Like from "../../../../components/Reactions/Like";
+import Love from "../../../../components/Reactions/Love";
+import Care from "../../../../components/Reactions/Care";
+import Haha from "../../../../components/Reactions/Haha";
+import Wow from "../../../../components/Reactions/Wow";
+import Sad from "../../../../components/Reactions/Sad";
+import Angry from "../../../../components/Reactions/Angry";
 
 TimeAgo.addDefaultLocale(en);
 const db = getFirestore();
@@ -54,6 +61,7 @@ function Direct() {
   const [activities, setActivities] = React.useState([]);
   const [uploading, setUploading] = React.useState(false);
   const [chat_media, setChatMedia] = React.useState(null);
+  const [reactions, setReactions] = React.useState(false);
   const router = useRouter();
   const user = useAuth();
 
@@ -443,16 +451,37 @@ function Direct() {
                       console.log(user.uid, chat);
                       return (
                         <>
-                          {chat.message.type === "text" && (
-                            <div
-                              className={`${styles.chat_bubble} ${
-                                user && user.uid == chat.from && styles.my_chat
-                              }`}
-                              key={index}
-                            >
-                              <p>{chat.message.content}</p>
-                            </div>
-                          )}
+                          {chat.message.type === "text" &&
+                            user &&
+                            user.uid == chat.from && (
+                              <div
+                                className={`${styles.chat_bubble} ${
+                                  user &&
+                                  user.uid == chat.from &&
+                                  styles.my_chat
+                                }`}
+                                key={index}
+                              >
+                                <p>{chat.message.content}</p>
+                              </div>
+                            )}
+
+                          {chat.message.type === "text" &&
+                            user &&
+                            user.uid !== chat.from && (
+                              <div
+                                className={`${styles.chat_bubble}`}
+                                key={index}
+                              >
+                                <div
+                                  className={styles.chat_user}
+                                  style={{
+                                    backgroundImage: `url(${currentChatUser.avatar})`,
+                                  }}
+                                ></div>
+                                <p>{chat.message.content}</p>
+                              </div>
+                            )}
 
                           {chat.message.type === "media" && (
                             <div
@@ -466,8 +495,53 @@ function Direct() {
                                 alt="message-media"
                               />
                               <div className={styles.actions}>
-                                <button>
+                                <button
+                                  className={styles.react_btn}
+                                  onFocus={() => {
+                                    setReactions(true);
+                                  }}
+                                  onBlur={() => {
+                                    setReactions(false);
+                                  }}
+                                  tabIndex={0}
+                                  autoFocus={false}
+                                >
                                   <MdOutlineEmojiEmotions />
+                                  <div
+                                    className={`${styles.reactions} ${
+                                      reactions && "reaction_enable"
+                                    } ${
+                                      user &&
+                                      user.uid == chat.from &&
+                                      styles.reaction__to
+                                    } ${
+                                      user &&
+                                      user.uid != chat.from &&
+                                      styles.reactions__from
+                                    }`}
+                                  >
+                                    <div className={styles.reaction}>
+                                      <img src="/svg/like.svg" alt="" />
+                                    </div>
+                                    <div className={styles.reaction}>
+                                      <img src="/svg/love.svg" alt="" />
+                                    </div>
+                                    <div className={styles.reaction}>
+                                      <img src="/svg/care.svg" alt="" />
+                                    </div>
+                                    <div className={styles.reaction}>
+                                      <img src="/svg/haha.svg" alt="" />
+                                    </div>
+                                    <div className={styles.reaction}>
+                                      <img src="/svg/wow.svg" alt="" />
+                                    </div>
+                                    <div className={styles.reaction}>
+                                      <img src="/svg/sad.svg" alt="" />
+                                    </div>
+                                    <div className={styles.reaction}>
+                                      <img src="/svg/angry.svg" alt="" />
+                                    </div>
+                                  </div>
                                 </button>
                                 <button>
                                   <HiOutlineReply />

@@ -197,6 +197,19 @@
     text-align: center;
     border-radius: 65px;
     border: 1px solid #dbdbdb;
+    position: relative;
+    margin-bottom: 45px;
+}
+.chat_user{
+    width:28px;
+    height: 28px;
+    background-color: #eee;
+    position: absolute;
+    top: -15px;
+    left: -5px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
 }
 .my_chat{
     align-self: flex-end;
@@ -204,6 +217,7 @@
 }
 .my_reaction{
     align-self: flex-end;
+    margin-bottom: 12px;
 }
 
 
@@ -381,4 +395,63 @@
 .new_chat_btn_secondary:hover{
     background-color: rgb(4, 57, 132);
     
+}
+
+.react_btn{
+    position: relative;
+}
+.reactions{
+    width:max-content;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: #fff;
+    border-radius: 65px;
+    position: absolute;
+    top:10px;
+    display: flex;
+    gap:18px;
+    align-items: center;
+    
+    opacity: 0;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+.reactions__from{
+    left:15px;
+}
+.rection__me{
+    right:15px;
+}
+
+
+
+.reaction{
+    width:28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation:translateX 0.2s ease-in-out 1;
+}
+
+@keyframes translateX {
+    0%{
+        transform: translateX(0px);
+    }
+    50%{
+        transform: translateX(-10px);
+    }
+    100%{
+        transform: translateX(0px);
+    }
+}
+
+.reaction:hover{
+    transform: translateY(-10px);
+}
+.reaction img{
+    width:28px;
+    height: 28px;
+    border-radius: 50%;
 }

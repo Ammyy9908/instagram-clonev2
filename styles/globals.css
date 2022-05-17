@@ -12,11 +12,18 @@ body {
 ::-webkit-scrollbar{
  display: none;
 }
+.heart_reaction{
+  margin-bottom: 45px;
+}
 
 .heart_reaction svg{
   fill: "red";
 }
 
+.reaction_enable{
+  top: -80px !important;
+  opacity: 1 !important;
+}
 .emoji_picker_enable{
   display: block !important;
 }

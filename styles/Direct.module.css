@@ -199,6 +199,7 @@
     border: 1px solid #dbdbdb;
     position: relative;
     margin-bottom: 45px;
+    margin-top: 45px;
 }
 .chat_user{
     width:28px;

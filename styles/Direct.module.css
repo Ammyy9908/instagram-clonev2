@@ -208,7 +208,47 @@
 
 
 .chat_media{
-    width:375px;
+    width:230px;
+    border-radius: 12px;
+    height: 340px;
+    object-fit: cover;
+    position: relative;
+    cursor: pointer;
+}
+.chat_media_image{
+    width:100%;
+    height:100%;
+    border-radius: 12px;
+}
+.chat_media:hover .actions{
+    opacity: 1;
+}
+.actions{
+    position: absolute;
+    width:max-content;
+    left: 10px;
+    bottom: 10px;
+    background-color: #fff;
+    height: 32px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 65px;
+    display: flex;
+    align-items: center;
+    gap:12px;
+    opacity: 0;
+}
+.actions button{
+    width:28px;
+    height:28px;
+    border-radius: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.actions button:hover{
+    background-color: #ccc;
+    
 }
 
 .new_chat_input_body{
@@ -234,6 +274,19 @@
     display: flex;
     align-items: center;
     gap:5px;
+}
+.new_chat_extra_controls label{
+    width:32px;
+    height:32px;
+    background-color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.new_chat_extra_controls label input{
+    display: none;
+    
 }
 
 .new_chat_custom_input form{

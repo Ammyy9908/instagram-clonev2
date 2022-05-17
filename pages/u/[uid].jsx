@@ -24,6 +24,7 @@ import { firebase } from "../../firebaseConfig";
 import Link from "next/link";
 import useComments from "../../hooks/useComments";
 import Progress from "../../components/Progress/Progress";
+import useAuth from "../../hooks/useAuth";
 
 function ProfilePost({ image, type, photoId }) {
   const [post, setPost] = React.useState(null);
@@ -83,7 +84,7 @@ function User() {
   const [tab, setTab] = React.useState(0);
   const [fdata, setFdata] = React.useState([]);
   const [mounted, setMounted] = React.useState(false);
-
+  const user = useAuth();
   React.useEffect(() => {
     const q = query(collection(db, "followers"));
 
@@ -171,11 +172,21 @@ function User() {
               )}
               {mounted ? (
                 <Link href="/accounts/edit">
-                  <a>
-                    <button className={`${styles.edit_btn} text-sm`}>
-                      Edit Profile
-                    </button>
-                  </a>
+                  {User.uid === user.uid ? (
+                    <a>
+                      <button className={`${styles.edit_btn} text-sm`}>
+                        Edit Profile
+                      </button>
+                    </a>
+                  ) : (
+                    <a>
+                      <button
+                        className={`${styles.edit_btn} text-sm ${styles.follow_button}`}
+                      >
+                        Follow
+                      </button>
+                    </a>
+                  )}
                 </Link>
               ) : (
                 <div className={styles.blank_edit_btn}></div>
@@ -222,9 +233,11 @@ function User() {
               )}
               {/* <span className="text-gray-600">Education</span> */}
               {User && <p>{User.bio}</p>}
-              <a href="#" className="text-sky-600">
-                {User && User.website}
-              </a>
+              {User && (
+                <a href={User.website} className="text-sky-600">
+                  {User.website}
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -242,30 +255,34 @@ function User() {
                 </span>
                 <span>POSTS</span>
               </div>
-              <div
-                className={`${styles.toggle_item} cursor-pointer ${
-                  tab === 1 && styles.toogle_item_enable
-                }`}
-                onClick={() => {
-                  setTab(1);
-                }}
-              >
-                <span>
-                  <img src="/assets/save_icon.svg" alt="" />
-                </span>
-                <span>SAVED</span>
-              </div>
-              <div
-                className={`${styles.toggle_item} ${
-                  tab === 2 && styles.toogle_item_enable
-                } cursor-pointer`}
-                onClick={() => setTab(2)}
-              >
-                <span>
-                  <img src="/assets/tag.svg" alt="" />
-                </span>
-                <span>TAGGED</span>
-              </div>
+              {User.uid === user.uid && (
+                <div
+                  className={`${styles.toggle_item} cursor-pointer ${
+                    tab === 1 && styles.toogle_item_enable
+                  }`}
+                  onClick={() => {
+                    setTab(1);
+                  }}
+                >
+                  <span>
+                    <img src="/assets/save_icon.svg" alt="" />
+                  </span>
+                  <span>SAVED</span>
+                </div>
+              )}
+              {
+                <div
+                  className={`${styles.toggle_item} ${
+                    tab === 2 && styles.toogle_item_enable
+                  } cursor-pointer`}
+                  onClick={() => setTab(2)}
+                >
+                  <span>
+                    <img src="/assets/tag.svg" alt="" />
+                  </span>
+                  <span>TAGGED</span>
+                </div>
+              }
             </div>
           </div>
         )}

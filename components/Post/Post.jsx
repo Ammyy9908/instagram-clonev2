@@ -16,6 +16,7 @@ import useComments from "../../hooks/useComments";
 import getComment from "../../utils/getComment";
 import useLikes from "../../hooks/useLikes";
 import useSaved from "../../hooks/useSaved";
+import Link from "next/link";
 TimeAgo.addDefaultLocale(en);
 
 function Post({ image, time, lat, long, uid, id, u }) {
@@ -57,7 +58,7 @@ function Post({ image, time, lat, long, uid, id, u }) {
     // get user of the post
     getCurrentUserData(uid)
       .then((user) => {
-        setUser(u);
+        setUser(user);
       })
       .catch((e) => console.log(e));
 
@@ -125,7 +126,86 @@ function Post({ image, time, lat, long, uid, id, u }) {
                 </div>
               )}
               <div className={styles.post_meta}>
-                {user && <p>{user.name}</p>}
+                {user && (
+                  <p
+                    className={`cursor-pointer font-bold text-gray-900 text-sm ${styles.user_post_username}`}
+                  >
+                    {user.username}
+
+                    <div className={styles.post_user_tooltip}>
+                      <div className={styles.post_user_tooltip_header}>
+                        <div className={styles.post_user_avatar_wrapper}>
+                          <div
+                            className={styles.post_user_avatar}
+                            style={{
+                              backgroundImage: `url(${user.avatar})`,
+                              backgroundSize: "cover",
+                              borderRadius: "50%",
+                            }}
+                          ></div>
+                        </div>
+                        <div className={styles.post_user_tooltip_meta}>
+                          <Link href={`/u/${user.uid}`}>
+                            <a className="text-sm font-light text-blue-700">
+                              {user.username}
+                            </a>
+                          </Link>
+                          <p className="text-gray-600 font-normal mb-2">
+                            {user.name}
+                          </p>
+                          {user.website && (
+                            <a
+                              href={user.website}
+                              className="text-sm font-light text-blue-700"
+                            >
+                              {user.website}
+                            </a>
+                          )}
+                          <p
+                            className={`${styles.post_user_mutual_friends} text-gray-400 font-normal mb-2 text-xs`}
+                          >
+                            <span>Followed by Mutual1 </span>
+                            and 26 more
+                          </p>
+                        </div>
+                      </div>
+
+                      <div
+                        className={styles.post_user_follower_post_followings}
+                      >
+                        <span className={styles.post_item}>
+                          <span>41,930</span>
+                          <span className="text-gray-400 text-sm font-normal">
+                            posts
+                          </span>
+                        </span>
+                        <span className={styles.follower_item}>
+                          <span>914k</span>
+                          <span className="text-gray-400 text-sm font-normal">
+                            followers
+                          </span>
+                        </span>
+                        <span className={styles.following_item}>
+                          <span>355</span>
+                          <span className="text-gray-400 text-sm font-normal">
+                            followings
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className={styles.post_user_recent_posts}>
+                        <div className={styles.recent_post}></div>
+                        <div className={styles.recent_post}></div>
+                        <div className={styles.recent_post}></div>
+                      </div>
+
+                      <div className={styles.ppst_user_tooltip_footer}>
+                        <button>Message</button>
+                        <button>Following</button>
+                      </div>
+                    </div>
+                  </p>
+                )}
                 {location && (
                   <p className="text-gray-500 text-sm">{location}</p>
                 )}

@@ -6,18 +6,18 @@ import Navbar from "../../../../components/Navbar/Navbar";
 import useAuth from "../../../../hooks/useAuth";
 import styles from "../../../../styles/Direct.module.css";
 import { BsEmojiWink, BsHeart } from "react-icons/bs";
-import { HiOutlinePencilAlt } from "react-icons/hi";
+import { HiOutlinePencilAlt, HiOutlineReply } from "react-icons/hi";
 import ChatItem from "../../../../components/ChatItem/ChatItem";
 import InfoIcon from "../../../../components/Icons/InfoIcon";
 import getMyChats from "../../../../utils/getMyChats";
-import { FiImage } from "react-icons/fi";
+import { FiImage, FiMoreHorizontal } from "react-icons/fi";
 import getCurrentUserData from "../../../../utils/getUser";
 import useChats from "../../../../hooks/useChats";
 import axios from "axios";
 import en from "javascript-time-ago/locale/en";
 import TimeAgo from "javascript-time-ago";
 import ReactTimeAgo from "react-time-ago";
-import useLive from "../../../../hooks/useLive";
+import Loader from "rsuite/Loader";
 import {
   collection,
   getFirestore,
@@ -25,9 +25,17 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { MdOutlineEmojiEmotions } from "react-icons/md";
 
 TimeAgo.addDefaultLocale(en);
 const db = getFirestore();
+const storage = getStorage();
 function Direct() {
   const [logout, setLogout] = React.useState(false);
   const [newPost, setNewPost] = React.useState(false);
@@ -44,6 +52,8 @@ function Direct() {
   const [emoji_picker, setEmojiPicker] = React.useState(false);
   const [recent_emojis, setRecentEmojis] = React.useState([]);
   const [activities, setActivities] = React.useState([]);
+  const [uploading, setUploading] = React.useState(false);
+  const [chat_media, setChatMedia] = React.useState(null);
   const router = useRouter();
   const user = useAuth();
 
@@ -164,6 +174,87 @@ function Direct() {
       console.log(e);
     }
   };
+
+  const sendMedia = async (media) => {
+    try {
+      const r = await axios.post(
+        `https://nextinstaserver.herokuapp.com/message/${
+          user_data && user_data.uid
+        }/${currentChatUser && currentChatUser.uid}`,
+        {
+          message: {
+            content: media,
+            type: "media",
+          },
+        }
+      );
+      console.log(r);
+      setMessage("");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  // handle chat media upload
+
+  const handleChatMedia = (e) => {
+    const file = e.target.files[0];
+    const { type, size, name } = file;
+    console.log(type);
+    const allowedExtension = ["image/jpg", "image/jpeg"];
+    if (!allowedExtension.includes(type)) {
+      console.log("file type not supported");
+      return;
+    }
+    // check size of image also
+    if (size > 989388) {
+      console.log("file size too large!make sure chat media less than 1mb");
+      return;
+    } else {
+      // upload media
+      console.log("Passed");
+      uploadFile(file);
+    }
+  };
+
+  const uploadFile = (file) => {
+    const storageRef = ref(storage, `photos/${user.uid}/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+    setUploading(true);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+      },
+      () => {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          sendMedia(downloadURL);
+          setUploading(false);
+        });
+      }
+    );
+  };
+
+  console.log("Uploading ..", uploading);
+  console.log("Chat Media", chat_media);
 
   return (
     <div>
@@ -363,14 +454,29 @@ function Direct() {
                             </div>
                           )}
 
-                          {chat.message.type === "image" && (
-                            <img
-                              src={chat.message.content}
+                          {chat.message.type === "media" && (
+                            <div
                               className={`${styles.chat_media} ${
                                 user && user.uid == chat.from && styles.my_chat
                               }`}
-                              alt="message-media"
-                            />
+                            >
+                              <img
+                                src={chat.message.content}
+                                className={`${styles.chat_media_image}`}
+                                alt="message-media"
+                              />
+                              <div className={styles.actions}>
+                                <button>
+                                  <MdOutlineEmojiEmotions />
+                                </button>
+                                <button>
+                                  <HiOutlineReply />
+                                </button>
+                                <button>
+                                  <FiMoreHorizontal />
+                                </button>
+                              </div>
+                            </div>
                           )}
 
                           {chat.message.type === "reaction" &&
@@ -596,9 +702,25 @@ function Direct() {
                   </form>
 
                   <div className={styles.new_chat_extra_controls}>
-                    <button>
-                      <FiImage />
-                    </button>
+                    <label htmlFor="image_file" className="bg-indigo-500">
+                      <input
+                        type="file"
+                        name="image_file"
+                        id="image_file"
+                        onChange={handleChatMedia}
+                      />
+
+                      {!uploading && <FiImage />}
+                      {uploading && (
+                        <div
+                          className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full text-gray-300"
+                          role="status"
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      )}
+                    </label>
+
                     <button onClick={sendHeart}>
                       <BsHeart />
                     </button>

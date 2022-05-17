@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./NewPostModal.module.css";
-import { BsEmojiLaughing } from "react-icons/bs";
 import uploadPost from "../../utils/uploadPost";
 import {
   getStorage,
@@ -9,7 +8,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { firebase } from "../../firebaseConfig";
-import { FaBullseye } from "react-icons/fa";
+
 const storage = getStorage();
 function NewPostIcon() {
   return (

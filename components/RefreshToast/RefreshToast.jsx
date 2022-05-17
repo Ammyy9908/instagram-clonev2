@@ -1,12 +1,12 @@
 import React from "react";
 import styles from "./RefreshToast.module.css";
 import getAllPosts from "../../utils/getAllPosts";
-function RefreshToast({ setPhotos, setRefresh }) {
+function RefreshToast({ setPhotos, setRefresh,setLoaded }) {
   const handleRefresh = () => {
     getAllPosts()
       .then((r) => {
         console.log(r);
-        setPhotos([]);
+        setLoaded(false);
 
         setTimeout(() => {
           setPhotos(r);

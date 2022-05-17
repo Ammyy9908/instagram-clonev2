@@ -31,6 +31,13 @@ gap:15px;
     font-weight: 500;
     border-radius: 4px;
 }
+.follow_button{
+    background-color: rgb(10, 145, 255);
+    color: #fff;
+    width:120px;
+    height: 42px;
+    border: none;
+}
 .setting_btn{
     width:32px;
     height:32px;

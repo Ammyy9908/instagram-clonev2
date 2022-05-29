@@ -151,9 +151,9 @@ function Direct() {
     e.preventDefault();
     try {
       const r = await axios.post(
-        `http://localhost:5000/message/${user_data && user_data.uid}/${
-          currentChatUser && currentChatUser.uid
-        }`,
+        `https://nextinstaserver.herokuapp.com/message/${
+          user_data && user_data.uid
+        }/${currentChatUser && currentChatUser.uid}`,
         {
           message: {
             content: message,
@@ -171,9 +171,9 @@ function Direct() {
   const sendHeart = async () => {
     try {
       const r = await axios.post(
-        `http://localhost:5000/message/${user_data && user_data.uid}/${
-          currentChatUser && currentChatUser.uid
-        }`,
+        `https://nextinstaserver.herokuapp.com/message/${
+          user_data && user_data.uid
+        }/${currentChatUser && currentChatUser.uid}`,
         {
           message: {
             content: "heart",
@@ -191,9 +191,9 @@ function Direct() {
   const sendMedia = async (media) => {
     try {
       const r = await axios.post(
-        `http://localhost:5000/message/${user_data && user_data.uid}/${
-          currentChatUser && currentChatUser.uid
-        }`,
+        `https://nextinstaserver.herokuapp.com/message/${
+          user_data && user_data.uid
+        }/${currentChatUser && currentChatUser.uid}`,
         {
           message: {
             content: media,

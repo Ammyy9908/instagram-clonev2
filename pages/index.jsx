@@ -49,7 +49,7 @@ export default function Home() {
 
   React.useEffect(() => {
     if (user) {
-      socket = io("http://localhost:5000/", {
+      socket = io("https://nextinstaserver.herokuapp.com/", {
         // [1] Important as fuck
         reconnectionDelay: 1000,
         reconnection: true,

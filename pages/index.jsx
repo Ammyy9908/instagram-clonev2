@@ -13,6 +13,7 @@ import BlankPostCard from "../components/BlankPostCard/BlankPostCard";
 import getMyIp from "../utils/getIp";
 import updateLastIp from "../utils/updateLastIp";
 import useUnload from "../hooks/useUnload";
+import requestNotificationPermission from "../utils/requestPermission";
 import {
   collection,
   query,
@@ -46,6 +47,18 @@ export default function Home() {
   const [skt, setSocket] = React.useState(null);
 
   const router = useRouter();
+
+  // Request Notifications Permission
+
+  React.useState(() => {
+    requestNotificationPermission().then((granted) => {
+      if (!granted) {
+        console.log("Notifications not granted");
+      } else {
+        console.log("Notifications granted");
+      }
+    });
+  }, []);
 
   React.useEffect(() => {
     if (user) {

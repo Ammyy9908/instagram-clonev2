@@ -191,9 +191,9 @@ function Direct() {
   const sendMedia = async (media) => {
     try {
       const r = await axios.post(
-        `https://nextinstaserver.herokuapp.com/message/${
-          user_data && user_data.uid
-        }/${currentChatUser && currentChatUser.uid}`,
+        `http://localhost:5000/message/${user_data && user_data.uid}/${
+          currentChatUser && currentChatUser.uid
+        }`,
         {
           message: {
             content: media,

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useRef } from "react";
 import Navbar from "../../../../components/Navbar/Navbar";
 import useAuth from "../../../../hooks/useAuth";
 import styles from "../../../../styles/Direct.module.css";
@@ -32,13 +32,11 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
-import Like from "../../../../components/Reactions/Like";
-import Love from "../../../../components/Reactions/Love";
-import Care from "../../../../components/Reactions/Care";
-import Haha from "../../../../components/Reactions/Haha";
-import Wow from "../../../../components/Reactions/Wow";
-import Sad from "../../../../components/Reactions/Sad";
-import Angry from "../../../../components/Reactions/Angry";
+
+import {
+  updateSenderReaction,
+  updateRecieverReaction,
+} from "../../../../utils/addReaction";
 
 TimeAgo.addDefaultLocale(en);
 const db = getFirestore();
@@ -64,10 +62,17 @@ function Direct() {
   const [reactions, setReactions] = React.useState(false);
   const router = useRouter();
   const user = useAuth();
-
+  const containerRef = useRef(null);
   const { id } = router.query;
+  const [totalChats, setTotalChats] = React.useState(0);
 
   const allChats = useChats();
+
+  React.useEffect(() => {
+    if (allChats.length > 0) {
+      setTotalChats(allChats.length);
+    }
+  }, [allChats]);
   console.log("activities", activities);
 
   React.useEffect(() => {
@@ -146,9 +151,9 @@ function Direct() {
     e.preventDefault();
     try {
       const r = await axios.post(
-        `https://nextinstaserver.herokuapp.com/message/${
-          user_data && user_data.uid
-        }/${currentChatUser && currentChatUser.uid}`,
+        `http://localhost:5000/message/${user_data && user_data.uid}/${
+          currentChatUser && currentChatUser.uid
+        }`,
         {
           message: {
             content: message,
@@ -166,9 +171,9 @@ function Direct() {
   const sendHeart = async () => {
     try {
       const r = await axios.post(
-        `https://nextinstaserver.herokuapp.com/message/${
-          user_data && user_data.uid
-        }/${currentChatUser && currentChatUser.uid}`,
+        `http://localhost:5000/message/${user_data && user_data.uid}/${
+          currentChatUser && currentChatUser.uid
+        }`,
         {
           message: {
             content: "heart",
@@ -186,9 +191,9 @@ function Direct() {
   const sendMedia = async (media) => {
     try {
       const r = await axios.post(
-        `https://nextinstaserver.herokuapp.com/message/${
-          user_data && user_data.uid
-        }/${currentChatUser && currentChatUser.uid}`,
+        `http://localhost:5000/message/${user_data && user_data.uid}/${
+          currentChatUser && currentChatUser.uid
+        }`,
         {
           message: {
             content: media,
@@ -263,6 +268,35 @@ function Direct() {
 
   console.log("Uploading ..", uploading);
   console.log("Chat Media", chat_media);
+
+  if (totalChats !== allChats.length) {
+    const element = containerRef.current;
+    if (element) {
+      element.scroll({
+        top: element.scrollHeight,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+  }
+
+  // handle sender reaction
+
+  const handleSenderReaction = (message_id, reaction) => {
+    updateSenderReaction(message_id, reaction)
+      .then((done) => {
+        console.log(done);
+      })
+      .catch((e) => console.log(e));
+  };
+
+  const handleRecieverReaction = (message_id, reaction) => {
+    updateRecieverReaction(message_id, reaction)
+      .then((done) => {
+        console.log(done);
+      })
+      .catch((e) => console.log(e));
+  };
 
   return (
     <div>
@@ -433,7 +467,7 @@ function Direct() {
                 </button>
               </div>
             ) : (
-              <div className={styles.user_chats}>
+              <div className={styles.user_chats} ref={containerRef}>
                 {mounted &&
                   user_data &&
                   allChats &&
@@ -444,7 +478,7 @@ function Direct() {
                         (chat.from == id && chat.to == user_data.uid)
                     )
                     .sort(
-                      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                      (b, a) => new Date(a.createdAt) - new Date(b.createdAt)
                     )
 
                     .map((chat, index) => {
@@ -494,6 +528,27 @@ function Direct() {
                                 className={`${styles.chat_media_image}`}
                                 alt="message-media"
                               />
+                              {chat.sender_reaction ||
+                              chat.reciever_reaction ? (
+                                <div className={styles.chat_reactions}>
+                                  {chat.sender_reaction && (
+                                    <span>
+                                      <img
+                                        src={`/svg/${chat.sender_reaction}.svg`}
+                                        alt=""
+                                      />
+                                    </span>
+                                  )}
+                                  {chat.reciever_reaction && (
+                                    <span>
+                                      <img
+                                        src={`/svg/${chat.reciever_reaction}.svg`}
+                                        alt=""
+                                      />
+                                    </span>
+                                  )}
+                                </div>
+                              ) : null}
                               <div className={styles.actions}>
                                 <button
                                   className={styles.react_btn}
@@ -520,25 +575,116 @@ function Direct() {
                                       styles.reactions__from
                                     }`}
                                   >
-                                    <div className={styles.reaction}>
+                                    <div
+                                      className={styles.reaction}
+                                      onClick={() => {
+                                        user && user.uid === chat.from
+                                          ? handleSenderReaction(
+                                              chat.message_id,
+                                              "like"
+                                            )
+                                          : handleRecieverReaction(
+                                              chat.message_id,
+                                              "like"
+                                            );
+                                      }}
+                                    >
                                       <img src="/svg/like.svg" alt="" />
                                     </div>
-                                    <div className={styles.reaction}>
+                                    <div
+                                      className={styles.reaction}
+                                      onClick={() => {
+                                        user && user.uid === chat.from
+                                          ? handleSenderReaction(
+                                              chat.message_id,
+                                              "love"
+                                            )
+                                          : handleRecieverReaction(
+                                              chat.message_id,
+                                              "love"
+                                            );
+                                      }}
+                                    >
                                       <img src="/svg/love.svg" alt="" />
                                     </div>
-                                    <div className={styles.reaction}>
+                                    <div
+                                      className={styles.reaction}
+                                      onClick={() => {
+                                        user && user.uid === chat.from
+                                          ? handleSenderReaction(
+                                              chat.message_id,
+                                              "care"
+                                            )
+                                          : handleRecieverReaction(
+                                              chat.message_id,
+                                              "care"
+                                            );
+                                      }}
+                                    >
                                       <img src="/svg/care.svg" alt="" />
                                     </div>
-                                    <div className={styles.reaction}>
+                                    <div
+                                      className={styles.reaction}
+                                      onClick={() => {
+                                        user && user.uid === chat.from
+                                          ? handleSenderReaction(
+                                              chat.message_id,
+                                              "haha"
+                                            )
+                                          : handleRecieverReaction(
+                                              chat.message_id,
+                                              "haha"
+                                            );
+                                      }}
+                                    >
                                       <img src="/svg/haha.svg" alt="" />
                                     </div>
-                                    <div className={styles.reaction}>
+                                    <div
+                                      className={styles.reaction}
+                                      onClick={() => {
+                                        user && user.uid === chat.from
+                                          ? handleSenderReaction(
+                                              chat.message_id,
+                                              "wow"
+                                            )
+                                          : handleRecieverReaction(
+                                              chat.message_id,
+                                              "wow"
+                                            );
+                                      }}
+                                    >
                                       <img src="/svg/wow.svg" alt="" />
                                     </div>
-                                    <div className={styles.reaction}>
+                                    <div
+                                      className={styles.reaction}
+                                      onClick={() => {
+                                        user && user.uid === chat.from
+                                          ? handleSenderReaction(
+                                              chat.message_id,
+                                              "sad"
+                                            )
+                                          : handleRecieverReaction(
+                                              chat.message_id,
+                                              "sad"
+                                            );
+                                      }}
+                                    >
                                       <img src="/svg/sad.svg" alt="" />
                                     </div>
-                                    <div className={styles.reaction}>
+                                    <div
+                                      className={styles.reaction}
+                                      onClick={() => {
+                                        user && user.uid === chat.from
+                                          ? handleSenderReaction(
+                                              chat.message_id,
+                                              "angry"
+                                            )
+                                          : handleRecieverReaction(
+                                              chat.message_id,
+                                              "angry"
+                                            );
+                                      }}
+                                    >
                                       <img src="/svg/angry.svg" alt="" />
                                     </div>
                                   </div>

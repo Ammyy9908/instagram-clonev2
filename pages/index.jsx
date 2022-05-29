@@ -49,7 +49,7 @@ export default function Home() {
 
   React.useEffect(() => {
     if (user) {
-      socket = io("https://nextinstaserver.herokuapp.com/", {
+      socket = io("http://localhost:5000/", {
         // [1] Important as fuck
         reconnectionDelay: 1000,
         reconnection: true,
@@ -161,12 +161,14 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {!mounted && <Progress />}
-      <Navbar
-        setLogout={setLogout}
-        user={user}
-        setNewPost={setNewPost}
-        mounted={mounted}
-      />
+      {user && (
+        <Navbar
+          setLogout={setLogout}
+          user={user}
+          setNewPost={setNewPost}
+          mounted={mounted}
+        />
+      )}
 
       <div className={`${styles.container}`}>
         {!loaded && (

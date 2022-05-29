@@ -17,8 +17,8 @@ body {
   margin-top: 45px;
 }
 
-.heart_reaction svg{
-  fill: "red";
+.heart_reaction svg path{
+  fill: #ccc !important;
 }
 
 .reaction_enable{

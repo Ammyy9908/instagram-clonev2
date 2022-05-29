@@ -229,6 +229,7 @@
     object-fit: cover;
     position: relative;
     cursor: pointer;
+    margin-bottom: 45px;
 }
 .chat_media_image{
     width:100%;
@@ -237,6 +238,29 @@
 }
 .chat_media:hover .actions{
     opacity: 1;
+}
+
+.chat_reactions{
+    position: absolute;
+    min-width:50px;
+    height: max-content;
+    background-color: rgb(255, 255, 255);
+    bottom: -18px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    border-radius: 65px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+.chat_reactions span{
+    width:15px;
+    height: 15px;
+    background-color: rgb(90, 90, 90);
+    display: block;
+    border-radius: 50%;
 }
 .actions{
     position: absolute;

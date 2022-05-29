@@ -16,6 +16,7 @@ import useComments from "../../hooks/useComments";
 import getComment from "../../utils/getComment";
 import useLikes from "../../hooks/useLikes";
 import useSaved from "../../hooks/useSaved";
+import setAlert from "../../utils/sendAlert";
 import Link from "next/link";
 TimeAgo.addDefaultLocale(en);
 
@@ -87,6 +88,21 @@ function Post({ image, time, lat, long, uid, id, u }) {
     LikePost(u, id)
       .then((r) => {
         setLikeCount(like_count + 1);
+        uid !== u.uid &&
+          setAlert({
+            type: "like",
+            generated_by: {
+              avatar: u.avatar,
+              name: u.name,
+              id: u.uid,
+            },
+            generated_for: uid,
+            created_at: new Date().getTime(),
+          })
+            .then((done) => {
+              console.log("alert", done);
+            })
+            .catch((e) => console.log(e));
       })
       .catch((e) => {
         console.log(e);

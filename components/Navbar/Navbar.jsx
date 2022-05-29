@@ -5,7 +5,9 @@ import { GrSettingsOption } from "react-icons/gr";
 import { BsBookmark } from "react-icons/bs";
 import { MdRestartAlt } from "react-icons/md";
 import { FiInstagram } from "react-icons/fi";
+import useAlerts from "../../hooks/useAlerts";
 import Link from "next/link";
+import getCurrentUserData from "../../utils/getUser";
 
 function NavLink({ children, link }) {
   return (
@@ -17,9 +19,9 @@ function NavLink({ children, link }) {
   );
 }
 
-function NavButton({ children, handler }) {
+function NavButton({ className, children, handler }) {
   return (
-    <div className={`${styles.menu_btn_item}`} onClick={handler}>
+    <div className={`${className} ${styles.menu_btn_item}`} onClick={handler}>
       {children}
     </div>
   );
@@ -27,6 +29,27 @@ function NavButton({ children, handler }) {
 
 function Navbar({ setLogout, user, setNewPost, mounted }) {
   const [dropdown, setDropdown] = React.useState(false);
+
+  const alerts = useAlerts(user.uid);
+
+  console.log("User Alerts", alerts);
+
+  // filter this week messages
+
+  const thisWeekLikeAlerts = () =>
+    alerts.filter((alert) => {
+      return (
+        (0 | (new Date(+alert.created_at).getDate() / 7)) + 1 ===
+          (0 | (new Date().getDate() / 7)) + 1 && alert.type === "like"
+      );
+    });
+
+  const getGenerator = async (uid) => {
+    let user = await getCurrentUserData(uid);
+    const { name } = user;
+    console.log("Generator Name", name);
+    return name;
+  };
 
   return (
     <div className={styles.navbar}>
@@ -79,8 +102,47 @@ function Navbar({ setLogout, user, setNewPost, mounted }) {
                   <NavLink link="/explore">
                     <img src="/assets/explore.svg" alt="" />
                   </NavLink>
-                  <NavButton>
+                  <NavButton className={styles.alert_button}>
+                    <span className={styles.alert_count}>{alerts.length}</span>
                     <img src="/assets/heart.svg" alt="" />
+
+                    <div className={styles.alert_component}>
+                      <div className={styles.alert__section}>
+                        {thisWeekLikeAlerts().length > 0 && (
+                          <div className={styles.alerts__container}>
+                            <div className={styles.alert_label}>This week</div>
+                            <div className={styles.alerts}>
+                              {thisWeekLikeAlerts().map((alert, i) => {
+                                return (
+                                  <div className={styles.alert__body} key={i}>
+                                    <div className={styles.alert_author}>
+                                      <div
+                                        className={styles.alert_user}
+                                        style={{
+                                          backgroundImage: `url(${alert.generated_by.avatar})`,
+                                          backgroundSize: "cover",
+                                        }}
+                                      ></div>
+                                    </div>
+                                    <div className={styles.alert_text}>
+                                      <p className="text-xs">
+                                        <strong>
+                                          {alert.generated_by.name}
+                                        </strong>{" "}
+                                        liked your photo. <span>2w</span>
+                                      </p>
+                                    </div>
+                                    <div
+                                      className={styles.liked_photo_preview}
+                                    ></div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </NavButton>
                   <NavButton>
                     <div

@@ -27,9 +27,6 @@ function Direct() {
   const user = useAuth();
 
   const handleScroll = (e) => {
-    console.log(e.target.scrollTop);
-    console.log(e.target.scrollHeight);
-    console.log(e.target.clientHeight);
     setPaddingBottom(
       e.target.scrollHeight - e.target.scrollTop * 2 - e.target.clientHeight
     );

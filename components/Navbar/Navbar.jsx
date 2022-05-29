@@ -30,7 +30,7 @@ function NavButton({ className, children, handler }) {
 function Navbar({ setLogout, user, setNewPost, mounted }) {
   const [dropdown, setDropdown] = React.useState(false);
 
-  const alerts = useAlerts(user.uid);
+  const alerts = useAlerts(user && user.uid);
 
   console.log("User Alerts", alerts);
 

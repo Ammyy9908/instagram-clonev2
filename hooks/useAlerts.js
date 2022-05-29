@@ -9,7 +9,6 @@ import {
 import React from "react";
 const db = getFirestore();
 function useAlerts(uid) {
-  console.log("User Id", uid);
   const [alerts, setAlerts] = React.useState([]);
   React.useEffect(() => {
     const q = query(

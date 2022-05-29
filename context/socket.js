@@ -3,7 +3,7 @@ import React from "react";
 
 function connectToSocket(is_connect) {
   const socket = is_connect
-    ? io.connect("http://localhost:5000", {
+    ? io.connect("https://nextinstaserver.herokuapp.com", {
         transports: ["websocket"],
       })
     : null;
